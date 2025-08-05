@@ -1,0 +1,20 @@
+=== PARKING LOT MANAGEMENT REPORT ===
+Generated on: Tue Aug 05 22:33:55 2025
+
+==========================================
+
+SYSTEM STATISTICS:
+Total Parking Spots: 50
+Occupied Spots: 1
+Available Spots: 49
+Occupancy Rate: 2.0%
+Estimated Current Revenue: $20.00
+
+USER STATISTICS:
+Registered Vehicles: 2
+Registered Admins: 1
+
+CURRENTLY PARKED VEHICLES:
+Spot Vehicle ID      License         Owner                Type       Duration(hrs)  
+--------------------------------------------------------------------------------
+2    VH0002          ASF-1235        Joe                  Bike       0.0
