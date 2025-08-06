@@ -101,7 +101,7 @@ int isValidPassword(char *password);
 int isValidLicensePlate(char *plate);
 void clearInputBuffer();
 void createDirectories();
-int findUserById(int userId);
+int findUserById(char *userId);
 int findVehicleById(char *vehicleId);
 int findAvailableSpot();
 void generateVehicleId(char *vehicleId);
@@ -671,7 +671,7 @@ void viewAllUsers() {
 
     for (int i = 0; i < numUsers; i++)
     {
-        printf("%-5d %-15s %-25s %-15s %-15s\n",
+        printf("%-5s %-15s %-25s %-15s %-15s\n",
                i + 1,
                users[i].userId,
                users[i].name,
@@ -746,67 +746,6 @@ void manageVehicles() {
     }
 }
 
-// Delete User
-void deleteUser() {
-    if (numUsers == 0) {
-        printf("No users to delete.\n");
-        return;
-    }
-
-    viewAllUsers();
-
-    int userId;
-    printf("Enter User ID to delete: ");
-    if (scanf("%d", &userId) != 1) {
-        printf("Invalid input.\n");
-        clearInputBuffer();
-        return;
-    }
-    clearInputBuffer();
-
-    int userIndex = findUserById(userId);
-    if (userIndex == -1) {
-        printf("User not found.\n");
-        return;
-    }
-
-    printf("Are you sure you want to delete user %s (ID: %d)? (y/n): ",
-           users[userIndex].name, userId);
-    char confirm;
-    scanf(" %c", &confirm);
-    clearInputBuffer();
-
-    if (confirm == 'y' || confirm == 'Y') {
-        // Remove user's vehicles first
-        for (int i = numVehicles - 1; i >= 0; i--) {
-            if (vehicles[i].ownerId == userId) {
-                if (vehicles[i].isParked) {
-                    spots[vehicles[i].spotNumber - 1].isOccupied = 0;
-                    strcpy(spots[vehicles[i].spotNumber - 1].vehicleId, "");
-                }
-                // Shift vehicles array
-                for (int j = i; j < numVehicles - 1; j++) {
-                    vehicles[j] = vehicles[j + 1];
-                }
-                numVehicles--;
-            }
-        }
-
-        // Remove user
-        for (int i = userIndex; i < numUsers - 1; i++) {
-            users[i] = users[i + 1];
-        }
-        numUsers--;
-
-        saveUserData();
-        saveVehicleData();
-        saveParkingData();
-
-        printf("User and vehicles deleted successfully.\n");
-    } else {
-        printf("User deletion cancelled.\n");
-    }
-}
 
 // Delete Vehicle
 void deleteVehicle() {
@@ -904,10 +843,11 @@ void saveUserData() {
         printf("ERROR: Cannot create/open user data file!\n");
         return;
     }
-//fprintf(fp, "%s %s %s\n", vehicleID, name, contact);
+//fprintf(fp, "%s %s %s %s\n", userID, name, contact, vehicleID);
     fprintf(fp, "%d\n", numUsers);
     for (int i = 0; i < numUsers; i++) {
-        fprintf(fp, "%s|%s|%s\n",
+        fprintf(fp, "%s|%s|%s|%s\n",
+                users[i].userId,
                 users[i].name,
                 users[i].phoneNumber,
                 users[i].vehicleID);
@@ -1173,9 +1113,9 @@ void clearInputBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-int findUserById(int userId) {
+int findUserById(char *userId) {
     for (int i = 0; i < numUsers; i++) {
-        if (users[i].userId == userId) {
+        if (strcmp(users[i].userId, userId) == 0) {
             return i;
         }
     }
@@ -1198,6 +1138,11 @@ int findAvailableSpot() {
         }
     }
     return -1;
+}
+
+void generateUserId(char *userId) {
+    static int userCounter = 1;
+    sprintf(userId, "USR%04d", userCounter++);
 }
 
 void generateVehicleId(char *vehicleId) {
