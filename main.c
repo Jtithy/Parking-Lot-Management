@@ -10,7 +10,7 @@
 #define MAX_VEHICLES 200
 #define MAX_PARKING_SPOTS 50
 #define NAME_LEN 50
-#define EMAIL_LEN 30
+#define EMAIL_LEN 20
 #define CONTACT_LEN 12
 #define PASSWORD_LEN 50
 #define USER_ID_LEN 20
@@ -1063,50 +1063,47 @@ void loadParkingData() {
 
 // Validate Name
 int isValidName(char *name) {
-    int len = strlen(name);
-    if (len < 2 || len >= NAME_LEN) return 0;
-
-    for (int i = 0; i < len; i++) {
-        if (!isalpha(name[i]) && name[i] != ' ') return 0;
+    if (strlen(name) > 20 || strlen(name) < 2) {
+        return 0; // Invalid name length
+    }
+    for (int i = 0; i < strlen(name); i++) {
+        if (!isalpha(name[i]) && name[i] != ' ') {
+            return 0; // Contains non-alphabetic characters
+        }
     }
     return 1;
 }
 
 // Validate Email
 int isValidEmail(char *email) {
-    int len = strlen(email);
-    if (len < 5 || len >= EMAIL_LEN) return 0;
-
-    int atCount = 0, atPos = -1, dotPos = -1;
-
-    for (int i = 0; i < len; i++) {
-        if (email[i] == '@') {
-            atCount++;
-            atPos = i;
-        } else if (email[i] == '.' && atPos != -1) {
-            dotPos = i;
-        }
+    if (strlen(email) > 20 || strlen(email) < 5) {
+        return 0; // Invalid email length
     }
-
-    return (atCount == 1 && atPos > 0 && dotPos > atPos + 1 && dotPos < len - 1);
+    if (strstr(email, "@gmail.com") == NULL) {
+        return 0; // Does not contain "@gmail.com"
+    }
+    return 1;
 }
 
 // Validate Phone Number
 int isValidPhoneNumber(char *phone) {
-    int len = strlen(phone);
-    if (len != 11) return 0;
-    if (phone[0] != '0' || phone[1] != '1') return 0;
-
+    if (strlen(phone) != 11) {
+        return 0; // Not exactly 11 digits
+    }
     for (int i = 0; i < 11; i++) {
-        if (!isdigit(phone[i])) return 0;
+        if (!isdigit(phone[i])) {
+            return 0; // Contains non-digit characters
+        }
     }
     return 1;
 }
 
 // Validate Password
 int isValidPassword(char *password) {
-    int len = strlen(password);
-    return (len >= 8 && len < PASSWORD_LEN);
+    if (strlen(password) < 8) {
+        return 0; // Less than 8 characters
+    }
+    return 1;
 }
 
 // Validate License Plate
@@ -1161,7 +1158,7 @@ double calculateParkingFee(time_t entryTime) {
     time_t currentTime = time(NULL);
     double hours = difftime(currentTime, entryTime) / 3600.0;
 
-    // Parking fee structure: TK 50 per hour, minimum TK 50
-    double fee = hours * 50.0;
-    return (fee < 50.0) ? 50.0 : fee;
+    // Parking fee structure: TK 100 per hour
+    double fee = hours * 100.0;
+    return (fee < 100.0) ? 100.0 : fee;
 }
