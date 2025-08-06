@@ -205,7 +205,8 @@ void registerAdmin() {          // Register new admin
         }
     }
 
-    while (1) {             // Get phone number
+    // Get phone number
+    while (1) {             
         printf("Enter Phone Number (exactly 11 digits starting with '01'): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -221,7 +222,8 @@ void registerAdmin() {          // Register new admin
         }
     }
 
-    while (1) {            // Get email
+    // Get email
+    while (1) {            
         printf("Enter Email: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -237,7 +239,8 @@ void registerAdmin() {          // Register new admin
         }
     }
 
-    while (1) {            // Get password
+    // Get password
+    while (1) {            
         printf("Enter Password (at least 8 characters): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -260,7 +263,8 @@ void registerAdmin() {          // Register new admin
     printf("You can now login.\n");
 }
 
-int loginAdmin() {               // Admin login function
+// Admin login function
+int loginAdmin() {               
     if (numAdmins == 0) {
         printf("ERROR: No admins registered. Please register first.\n");
         return 0;
@@ -270,28 +274,31 @@ int loginAdmin() {               // Admin login function
     char input_name[NAME_LEN];
     char input_password[PASSWORD_LEN];
 
-    printf("Enter Admin Name: ");      // Get admin name
+    // Get admin name
+    printf("Enter Admin Name: ");      
     if (fgets(input_name, sizeof(input_name), stdin) == NULL) {
         printf("Error reading name.\n");
         return 0;
     }
     input_name[strcspn(input_name, "\n")] = 0;
 
-    char *start = input_name;         // Trim leading spaces
+    // Trim leading spaces
+    char *start = input_name;         
     while (*start == ' ') start++;
     char *end = start + strlen(start) - 1;
     while (end > start && *end == ' ') end--;
     *(end + 1) = 0;
     strcpy(input_name, start);
 
-    printf("Enter Password: ");        // Get admin password
+    // Get admin password
+    printf("Enter Password: ");        
     if (fgets(input_password, sizeof(input_password), stdin) == NULL) {
         printf("Error reading password.\n");
         return 0;
     }
     input_password[strcspn(input_password, "\n")] = 0;
 
-    for (int i = 0; i < numAdmins; i++) {           // Check credentials
+    for (int i = 0; i < numAdmins; i++) {           
         if (strcmp(admins[i].name, input_name) == 0 &&
             strcmp(admins[i].password, input_password) == 0) {
             printf("Login successful! Welcome, %s!\n", admins[i].name);
@@ -303,7 +310,8 @@ int loginAdmin() {               // Admin login function
     return 0;
 }
 
-void adminMenu() {                  // Admin menu function
+// Admin menu function
+void adminMenu() {                  
     int choice;
     while (1) {
         printf("\n========== ADMIN PANEL ==========\n");
@@ -347,7 +355,8 @@ void adminMenu() {                  // Admin menu function
     }
 }
 
-void addVehicle() {          // Add new vehicle
+// Add new vehicle
+void addVehicle() {          
 
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
@@ -356,7 +365,8 @@ void addVehicle() {          // Add new vehicle
     int ownerId;
     char temp_input[200];
 
-    printf("Enter License Plate: ");       // Get license plate
+    // Get license plate
+    printf("Enter License Plate: ");       
     fgets(licensePlate, sizeof(licensePlate), stdin);
     licensePlate[strcspn(licensePlate, "\n")] = 0;
 
@@ -365,20 +375,24 @@ void addVehicle() {          // Add new vehicle
         return;
     }
 
-    printf("Enter Vehicle Type (Car/Bike/etc): ");       // Get vehicle type
+    // Get vehicle type
+    printf("Enter Vehicle Type (Car/Bike/etc): ");       
     fgets(vehicleType, sizeof(vehicleType), stdin);
     vehicleType[strcspn(vehicleType, "\n")] = 0;
 
-    while (1) {                     // Get owner name
+    // Get owner name
+    while (1) {                     
         printf("Enter Owner Name: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
-        temp_input[strcspn(temp_input, "\n")] = 0;       // Remove newline character
+        // Remove newline character
+        temp_input[strcspn(temp_input, "\n")] = 0;       
 
-        char *start = temp_input;               // Trim leading spaces
+        // Trim leading spaces
+        char *start = temp_input;               
         while (*start == ' ') start++;
         char *end = start + strlen(start) - 1;
         while (end > start && *end == ' ') end--;
@@ -393,7 +407,8 @@ void addVehicle() {          // Add new vehicle
     }
     users[numUsers].userId = nextUserId++;
 
-    while (1) {                      // Get owner phone number
+    // Get owner phone number
+    while (1) {                      
         printf("Enter Phone Number (exactly 11 digits starting with '01'): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -409,7 +424,8 @@ void addVehicle() {          // Add new vehicle
         }
     }
 
-    generateVehicleId(vehicleId);           // Generate unique vehicle ID
+    // Generate unique vehicle ID
+    generateVehicleId(vehicleId);           
     strcpy(vehicles[numVehicles].vehicleId, vehicleId);
     strcpy(vehicles[numVehicles].licensePlate, licensePlate);
     strcpy(vehicles[numVehicles].ownerName, users[numUsers].name);
@@ -426,7 +442,8 @@ void addVehicle() {          // Add new vehicle
     printf("Vehicle added successfully. ID: %s\n", vehicleId);
 }
 
-void parkVehicle() {           // Park a vehicle
+// Park a vehicle
+void parkVehicle() {           
     if (numVehicles == 0) {
         printf("No vehicles registered.\n");
         return;
@@ -458,7 +475,8 @@ void parkVehicle() {           // Park a vehicle
         return;
     }
 
-    vehicles[vehicleIndex].isParked = 1;             // Mark vehicle as parked
+    // Mark vehicle as parked
+    vehicles[vehicleIndex].isParked = 1;             
     vehicles[vehicleIndex].spotNumber = availableSpot;
     vehicles[vehicleIndex].entryTime = time(NULL);
 
@@ -475,7 +493,8 @@ void parkVehicle() {           // Park a vehicle
     printf("Entry Time: %s", ctime(&vehicles[vehicleIndex].entryTime));
 }
 
-void unparkVehicle() {              // Unpark a vehicle
+// Unpark a vehicle
+void unparkVehicle() {              
     printf("\n------- Unpark Vehicle -------\n");
 
     char vehicleId[VEHICLE_ID_LEN];
@@ -499,7 +518,8 @@ void unparkVehicle() {              // Unpark a vehicle
     int spotNumber = vehicles[vehicleIndex].spotNumber;
     double parkingFee = calculateParkingFee(vehicles[vehicleIndex].entryTime);
 
-    vehicles[vehicleIndex].isParked = 0;               // Mark vehicle as unparked
+    // Mark vehicle as unparked
+    vehicles[vehicleIndex].isParked = 0;               
     int oldSpotNumber = vehicles[vehicleIndex].spotNumber;
     vehicles[vehicleIndex].spotNumber = 0;
     vehicles[vehicleIndex].entryTime = 0;
@@ -519,7 +539,8 @@ void unparkVehicle() {              // Unpark a vehicle
     printf("Thank you for using our parking service!\n");
 }
 
-void displayParkingStatus() {                   // Display current parking status
+// Display current parking status
+void displayParkingStatus() {                  
     printf("\n========== PARKING STATUS ==========\n");
 
     int occupied = 0;
@@ -552,7 +573,8 @@ void displayParkingStatus() {                   // Display current parking statu
     }
 }
 
-void generateReport() {           // Generate parking report
+// Generate parking report
+void generateReport() {           
     printf("\n========== PARKING REPORT ==========\n");
 
     time_t currentTime = time(NULL);
@@ -565,11 +587,12 @@ void generateReport() {           // Generate parking report
         return;
     }
 
-    fprintf(fp, "=== PARKING LOT MANAGEMENT REPORT ===\n");               // Write report header
+    fprintf(fp, "=== PARKING LOT MANAGEMENT REPORT ===\n");       
     fprintf(fp, "Generated on: %s\n", ctime(&currentTime));
     fprintf(fp, "==========================================\n\n");
 
-    int occupied = 0;             // Count occupied spots and calculate revenue
+    // Count occupied spots and calculate revenue
+    int occupied = 0;             
     double totalRevenue = 0.0;
 
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
@@ -587,7 +610,8 @@ void generateReport() {           // Generate parking report
     fprintf(fp, "USER STATISTICS:\n");
     fprintf(fp, "Registered Vehicles: %d\n", numVehicles);
     fprintf(fp, "Registered Admins: %d\n\n", numAdmins);
-    fprintf(fp, "CURRENTLY PARKED VEHICLES:\n");              // Write currently parked vehicles`
+    // Write currently parked vehicles`
+    fprintf(fp, "CURRENTLY PARKED VEHICLES:\n");              
     fprintf(fp, "%-4s %-15s %-15s %-20s %-10s %-15s\n",
             "Spot", "Vehicle ID", "License", "Owner", "Type", "Duration(hrs)");
     fprintf(fp, "--------------------------------------------------------------------------------\n");
@@ -612,7 +636,8 @@ void generateReport() {           // Generate parking report
 
     printf("Report generated successfully!\n");
     printf("Report saved as: %s\n", filename);
-    printf("\nREPORT SUMMARY:\n");                   // Display summary on screen
+    // Display summary on screen
+    printf("\nREPORT SUMMARY:\n");                   
     printf("Total Spots: %d\n", MAX_PARKING_SPOTS);
     printf("Occupied: %d\n", occupied);
     printf("Available: %d\n", MAX_PARKING_SPOTS - occupied);
@@ -620,7 +645,8 @@ void generateReport() {           // Generate parking report
     printf("Current Revenue: $%.2f\n", totalRevenue);
 }
 
-void viewAllUsers() {              // View all registered users
+// View all registered users
+void viewAllUsers() {              
     printf("\n========== ALL USERS ==========\n");
     if (numUsers == 0)
     {
