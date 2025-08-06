@@ -8,7 +8,7 @@ Total Parking Spots: 50
 Occupied Spots: 1
 Available Spots: 49
 Occupancy Rate: 2.0%
-Estimated Current Revenue: $20.00
+Estimated Current Revenue: TK- 20.00/=
 
 USER STATISTICS:
 Registered Vehicles: 2
