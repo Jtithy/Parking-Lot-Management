@@ -333,7 +333,7 @@ void adminMenu() {
         printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
         printf("3. Generate Report\n");
-        printf("4. Manage Users\n");
+        printf("4. View All Users\n");
         printf("5. Logout\n");
         printf("=================================\n");
         printf("Enter your choice: ");
@@ -355,7 +355,7 @@ void adminMenu() {
                 generateReport();
                 break;
             case 4:
-                manageUsers();
+                viewAllUsers();
                 break;
             case 5:
                 printf("Logged out successfully.\n");
@@ -617,7 +617,7 @@ void generateReport() {
     fprintf(fp, "Occupied Spots: %d\n", occupied);
     fprintf(fp, "Available Spots: %d\n", MAX_PARKING_SPOTS - occupied);
     fprintf(fp, "Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
-    fprintf(fp, "Estimated Current Revenue: $%.2f\n\n", totalRevenue);
+    fprintf(fp, "Estimated Current Revenue: TK- %.2f/=\n\n", totalRevenue);
     fprintf(fp, "USER STATISTICS:\n");
     fprintf(fp, "Registered Vehicles: %d\n", numVehicles);
     fprintf(fp, "Registered Admins: %d\n\n", numAdmins);
@@ -653,7 +653,7 @@ void generateReport() {
     printf("Occupied: %d\n", occupied);
     printf("Available: %d\n", MAX_PARKING_SPOTS - occupied);
     printf("Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
-    printf("Current Revenue: $%.2f\n", totalRevenue);
+    printf("Current Revenue: TK- %.2f/=\n", totalRevenue);
 }
 
 // View all registered users
@@ -666,16 +666,17 @@ void viewAllUsers() {
     }
 
     printf("\n===== Registered Users =====\n");
-    printf("%-5s %-15s %-25s %-15s\n", "No.", "Vehicle ID", "Name", "Contact");
+    printf("%-5s %-15s %-25s %-15s %-15s\n", "No.", "User ID", "Name", "Contact", "Vehicle ID");
     printf("-------------------------------------------------------------\n");
 
     for (int i = 0; i < numUsers; i++)
     {
-        printf("%-5d %-15s %-25s %-15s\n",
+        printf("%-5d %-15s %-25s %-15s %-15s\n",
                i + 1,
-               users[i].vehicleID,
+               users[i].userId,
                users[i].name,
-               users[i].phoneNumber);
+               users[i].phoneNumber,
+               users[i].vehicleID);
     }
 
 }
@@ -703,35 +704,7 @@ void viewAllVehicles() {
     }
 }
 
-void manageUsers() {
-    int choice;
-    printf("\n========== MANAGE USERS ==========\n");
-    printf("1. View All Users\n");
-    printf("2. Delete User\n");
-    printf("3. Back to Admin Menu\n");
-    printf("Enter choice: ");
-
-    if (scanf("%d", &choice) != 1) {
-        printf("Invalid input.\n");
-        clearInputBuffer();
-        return;
-    }
-    clearInputBuffer();
-
-    switch (choice) {
-        case 1:
-            viewAllUsers();
-            break;
-        case 2:
-            deleteUser();
-            break;
-        case 3:
-            return;
-        default:
-            printf("Invalid choice.\n");
-    }
-}
-
+// Manage vehicles menu
 void manageVehicles() {
     int choice;
     printf("\n========== MANAGE VEHICLES ==========\n");
