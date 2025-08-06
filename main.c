@@ -104,6 +104,7 @@ void createDirectories();
 int findUserById(char *userId);
 int findVehicleById(char *vehicleId);
 int findAvailableSpot();
+void generateUserId(char *userId);
 void generateVehicleId(char *vehicleId);
 
 // Debugging function
@@ -445,7 +446,7 @@ void addVehicle() {
     vehicles[numVehicles].isParked = 0;
     vehicles[numVehicles].spotNumber = 0;
     vehicles[numVehicles].entryTime = 0;
-    
+    vehicles[numVehicles].ownerId = numUsers; // Link vehicle to user
 
     numVehicles++;
     saveVehicleData();
@@ -546,7 +547,7 @@ void unparkVehicle() {
     printf("Vehicle ID: %s\n", vehicleId);
     printf("License Plate: %s\n", vehicles[vehicleIndex].licensePlate);
     printf("Parking Spot: %d (now available)\n", spotNumber);
-    printf("Parking Fee: $%.2f\n", parkingFee);
+    printf("Parking Fee: TK- %.2f/=\n", parkingFee);
     printf("Thank you for using our parking service!\n");
 }
 
@@ -1154,7 +1155,7 @@ double calculateParkingFee(time_t entryTime) {
     time_t currentTime = time(NULL);
     double hours = difftime(currentTime, entryTime) / 3600.0;
 
-    // Parking fee structure: $2 per hour, minimum $2
-    double fee = hours * 20.0;
-    return (fee < 2.0) ? 20.0 : fee;
+    // Parking fee structure: TK 50 per hour, minimum TK 50
+    double fee = hours * 50.0;
+    return (fee < 50.0) ? 50.0 : fee;
 }
