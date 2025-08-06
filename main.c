@@ -1060,6 +1060,8 @@ void loadParkingData() {
 }
 
 // Utility functions
+
+// Validate Name
 int isValidName(char *name) {
     int len = strlen(name);
     if (len < 2 || len >= NAME_LEN) return 0;
@@ -1070,6 +1072,7 @@ int isValidName(char *name) {
     return 1;
 }
 
+// Validate Email
 int isValidEmail(char *email) {
     int len = strlen(email);
     if (len < 5 || len >= EMAIL_LEN) return 0;
@@ -1088,6 +1091,7 @@ int isValidEmail(char *email) {
     return (atCount == 1 && atPos > 0 && dotPos > atPos + 1 && dotPos < len - 1);
 }
 
+// Validate Phone Number
 int isValidPhoneNumber(char *phone) {
     int len = strlen(phone);
     if (len != 11) return 0;
@@ -1099,11 +1103,13 @@ int isValidPhoneNumber(char *phone) {
     return 1;
 }
 
+// Validate Password
 int isValidPassword(char *password) {
     int len = strlen(password);
     return (len >= 8 && len < PASSWORD_LEN);
 }
 
+// Validate License Plate
 int isValidLicensePlate(char *plate) {
     int len = strlen(plate);
     return (len >= 3 && len < LICENSE_PLATE_LEN);
