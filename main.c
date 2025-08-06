@@ -13,6 +13,7 @@
 #define EMAIL_LEN 30
 #define CONTACT_LEN 12
 #define PASSWORD_LEN 50
+#define USER_ID_LEN 20
 #define VEHICLE_ID_LEN 20
 #define LICENSE_PLATE_LEN 15
 #define VEHICLE_TYPE_LEN 20
@@ -26,11 +27,12 @@ typedef struct {
 } Admin;
 
 // For User
-typedef struct {          
+typedef struct {  
+    char userId[USER_ID_LEN];        
     char name[NAME_LEN];
     char vehicleID[VEHICLE_ID_LEN];
     char phoneNumber[CONTACT_LEN];
-    int userId;
+
 } User;
 
 // For Vehicle
@@ -63,8 +65,6 @@ ParkingSpot spots[MAX_PARKING_SPOTS];
 int numAdmins = 0;
 int numUsers = 0;
 int numVehicles = 0;
-int nextUserId = 1001;
-int currentLoggedUserId = -1;
 
 // Function prototypes
 void initializeSystem();     
@@ -416,7 +416,7 @@ void addVehicle() {
             printf("Invalid name. Please enter a valid name (letters and spaces only).\n");
         }
     }
-    users[numUsers].userId = nextUserId++;
+    generateUserId(users[numUsers].userId);
 
     // Get owner phone number
     while (1) {                      
