@@ -216,7 +216,7 @@ void registerAdmin() {
             strcpy(admins[numAdmins].name, start);
             break;
         } else {
-            printf("Invalid name. Please enter a valid name (letters and spaces only, 2-49 characters).\n");
+            printf("Invalid name. Please enter a valid name (letters and spaces only).\n");
         }
     }
 
@@ -320,7 +320,7 @@ int loginAdmin() {
             return 1;
         }
     }
-    printf("ERROR: No matching credentials found.\n");
+    printf("ERROR: No matching admin found.\n");
     printf("Please check your username and password.\n");
     return 0;
 }
@@ -330,12 +330,11 @@ void adminMenu() {
     int choice;
     while (1) {
         printf("\n========== ADMIN PANEL ==========\n");
-        printf("1. View All Vehicles\n");
+        printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
         printf("3. Generate Report\n");
         printf("4. Manage Users\n");
-        printf("5. Manage Vehicles\n");
-        printf("6. Logout\n");
+        printf("5. Logout\n");
         printf("=================================\n");
         printf("Enter your choice: ");
 
@@ -347,7 +346,7 @@ void adminMenu() {
         clearInputBuffer();
         switch (choice) {
             case 1:
-                viewAllVehicles();
+                manageVehicles();
                 break;
             case 2:
                 displayParkingStatus();
@@ -359,9 +358,6 @@ void adminMenu() {
                 manageUsers();
                 break;
             case 5:
-                manageVehicles();
-                break;
-            case 6:
                 printf("Logged out successfully.\n");
                 return;
             default:
