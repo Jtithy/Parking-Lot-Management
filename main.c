@@ -17,21 +17,24 @@
 #define LICENSE_PLATE_LEN 15
 #define VEHICLE_TYPE_LEN 20
 
-typedef struct {          // For Admin
+// For Admin
+typedef struct {          
     char name[NAME_LEN];
     char phoneNumber[CONTACT_LEN];
     char email[EMAIL_LEN];
     char password[PASSWORD_LEN];
 } Admin;
 
-typedef struct {          // For User
+// For User
+typedef struct {          
     char name[NAME_LEN];
     char vehicleID[VEHICLE_ID_LEN];
     char phoneNumber[CONTACT_LEN];
     int userId;
 } User;
 
-typedef struct {           // For Vehicle
+// For Vehicle
+typedef struct {           
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
     char ownerName[NAME_LEN];
@@ -43,7 +46,8 @@ typedef struct {           // For Vehicle
     time_t entryTime;
 } Vehicle;
 
-typedef struct {           // For Parking Spot
+// For Parking Spot
+typedef struct {           
     int spotNumber;
     int isOccupied;
     char vehicleId[VEHICLE_ID_LEN];
@@ -51,7 +55,8 @@ typedef struct {           // For Parking Spot
     double parkingFee;
 } ParkingSpot;
 
-Admin admins[MAX_ADMINS];     // Global variables
+// Global variables
+Admin admins[MAX_ADMINS];     
 User users[MAX_USERS];
 Vehicle vehicles[MAX_VEHICLES];
 ParkingSpot spots[MAX_PARKING_SPOTS];
@@ -61,7 +66,8 @@ int numVehicles = 0;
 int nextUserId = 1001;
 int currentLoggedUserId = -1;
 
-void initializeSystem();     // Function prototypes
+// Function prototypes
+void initializeSystem();     
 void mainMenu();
 void adminMenu();
 int loginAdmin();
@@ -87,7 +93,8 @@ void deleteUser();
 void deleteVehicle();
 double calculateParkingFee(time_t entryTime);
 
-int isValidName(char *name);        // Validation functions
+// Validation functions
+int isValidName(char *name);        
 int isValidEmail(char *email);
 int isValidPhoneNumber(char *phone);
 int isValidPassword(char *password);
@@ -99,7 +106,8 @@ int findVehicleById(char *vehicleId);
 int findAvailableSpot();
 void generateVehicleId(char *vehicleId);
 
-void debugShowAllAdmins();         // Debugging function
+// Debugging function
+void debugShowAllAdmins();         
 
 int main() {
     initializeSystem();
@@ -107,7 +115,8 @@ int main() {
     return 0;
 }
 
-void initializeSystem() {          // Initialize the system
+// Initialize the system
+void initializeSystem() {          
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
         spots[i].spotNumber = i + 1;
         spots[i].isOccupied = 0;
@@ -127,7 +136,8 @@ void initializeSystem() {          // Initialize the system
     printf("Registered Vehicles: %d\n", numVehicles);
 }
 
-void createDirectories() {       // Create necessary directories
+// Create necessary directories
+void createDirectories() {       
     #ifdef _WIN32
         system("mkdir admin >nul 2>&1");
         system("mkdir users >nul 2>&1");
@@ -139,7 +149,8 @@ void createDirectories() {       // Create necessary directories
     #endif
 }
 
-void mainMenu() {          // Main menu for the system
+// Main menu for the system
+void mainMenu() {          
     int choice;
     while (1) {
         printf("\n========== PARKING LOT MANAGEMENT SYSTEM ==========\n");
@@ -174,7 +185,8 @@ void mainMenu() {          // Main menu for the system
     }
 }
 
-void registerAdmin() {          // Register new admin
+// Register new admin
+void registerAdmin() {          
     if (numAdmins >= MAX_ADMINS) {
         printf("ERROR: Maximum number of admins reached.\n");
         return;
@@ -182,16 +194,19 @@ void registerAdmin() {          // Register new admin
     printf("\n------- Admin Registration -------\n");
     char temp_input[200];
 
-    while (1) {            // Get admin name
+    // Get admin name
+    while (1) {            
         printf("Enter Admin Name: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
-        temp_input[strcspn(temp_input, "\n")] = 0;        // Remove newline character
+        // Remove newline character
+        temp_input[strcspn(temp_input, "\n")] = 0;        
 
-        char *start = temp_input;                         // Trim leading spaces
+        // Trim leading spaces
+        char *start = temp_input;                         
         while (*start == ' ') start++;
         char *end = start + strlen(start) - 1;
         while (end > start && *end == ' ') end--;
