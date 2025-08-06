@@ -17,25 +17,21 @@
 #define LICENSE_PLATE_LEN 15
 #define VEHICLE_TYPE_LEN 20
 
-// Structures
-
-// For Admin
-typedef struct {
+typedef struct {          // For Admin
     char name[NAME_LEN];
     char phoneNumber[CONTACT_LEN];
     char email[EMAIL_LEN];
     char password[PASSWORD_LEN];
 } Admin;
 
-typedef struct {
+typedef struct {          // For User
     char name[NAME_LEN];
     char vehicleID[VEHICLE_ID_LEN];
     char phoneNumber[CONTACT_LEN];
     int userId;
 } User;
 
-// For Vehicle
-typedef struct {
+typedef struct {           // For Vehicle
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
     char ownerName[NAME_LEN];
@@ -47,8 +43,7 @@ typedef struct {
     time_t entryTime;
 } Vehicle;
 
-// For Parking Lot
-typedef struct {
+typedef struct {           // For Parking Spot
     int spotNumber;
     int isOccupied;
     char vehicleId[VEHICLE_ID_LEN];
@@ -56,8 +51,7 @@ typedef struct {
     double parkingFee;
 } ParkingSpot;
 
-// Global variables
-Admin admins[MAX_ADMINS];
+Admin admins[MAX_ADMINS];     // Global variables
 User users[MAX_USERS];
 Vehicle vehicles[MAX_VEHICLES];
 ParkingSpot spots[MAX_PARKING_SPOTS];
@@ -67,8 +61,7 @@ int numVehicles = 0;
 int nextUserId = 1001;
 int currentLoggedUserId = -1;
 
-// Function declarations
-void initializeSystem();
+void initializeSystem();     // Function prototypes
 void mainMenu();
 void adminMenu();
 int loginAdmin();
@@ -94,8 +87,7 @@ void deleteUser();
 void deleteVehicle();
 double calculateParkingFee(time_t entryTime);
 
-// Validation functions
-int isValidName(char *name);
+int isValidName(char *name);        // Validation functions
 int isValidEmail(char *email);
 int isValidPhoneNumber(char *phone);
 int isValidPassword(char *password);
@@ -107,8 +99,7 @@ int findVehicleById(char *vehicleId);
 int findAvailableSpot();
 void generateVehicleId(char *vehicleId);
 
-// Debug functions
-void debugShowAllAdmins();
+void debugShowAllAdmins();         // Debugging function
 
 int main() {
     initializeSystem();
@@ -116,9 +107,7 @@ int main() {
     return 0;
 }
 
-// Initialization
-void initializeSystem() {
-    // Initialize parking spots
+void initializeSystem() {          // Initialize the system
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
         spots[i].spotNumber = i + 1;
         spots[i].isOccupied = 0;
@@ -126,7 +115,6 @@ void initializeSystem() {
         spots[i].entryTime = 0;
         spots[i].parkingFee = 0.0;
     }
-
     createDirectories();
     loadAdminData();
     loadUserData();
@@ -139,8 +127,7 @@ void initializeSystem() {
     printf("Registered Vehicles: %d\n", numVehicles);
 }
 
-// Directories
-void createDirectories() {
+void createDirectories() {       // Create necessary directories
     #ifdef _WIN32
         system("mkdir admin >nul 2>&1");
         system("mkdir users >nul 2>&1");
@@ -152,10 +139,8 @@ void createDirectories() {
     #endif
 }
 
-//Main Menu
-void mainMenu() {
+void mainMenu() {          // Main menu for the system
     int choice;
-
     while (1) {
         printf("\n========== PARKING LOT MANAGEMENT SYSTEM ==========\n");
         printf("1. Admin Login\n");
@@ -189,30 +174,24 @@ void mainMenu() {
     }
 }
 
-// Admin Register
-void registerAdmin() {
+void registerAdmin() {          // Register new admin
     if (numAdmins >= MAX_ADMINS) {
         printf("ERROR: Maximum number of admins reached.\n");
         return;
     }
-
     printf("\n------- Admin Registration -------\n");
-
     char temp_input[200];
 
-    // Get admin name
-    while (1) {
+    while (1) {            // Get admin name
         printf("Enter Admin Name: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
-        // Remove newline
-        temp_input[strcspn(temp_input, "\n")] = 0;
+        temp_input[strcspn(temp_input, "\n")] = 0;        // Remove newline character
 
-        // Trim leading/trailing spaces
-        char *start = temp_input;
+        char *start = temp_input;                         // Trim leading spaces
         while (*start == ' ') start++;
         char *end = start + strlen(start) - 1;
         while (end > start && *end == ' ') end--;
@@ -226,8 +205,7 @@ void registerAdmin() {
         }
     }
 
-    // Get phone number
-    while (1) {
+    while (1) {             // Get phone number
         printf("Enter Phone Number (exactly 11 digits starting with '01'): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -243,8 +221,7 @@ void registerAdmin() {
         }
     }
 
-    // Get email
-    while (1) {
+    while (1) {            // Get email
         printf("Enter Email: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -260,8 +237,7 @@ void registerAdmin() {
         }
     }
 
-    // Get password
-    while (1) {
+    while (1) {            // Get password
         printf("Enter Password (at least 8 characters): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -276,7 +252,6 @@ void registerAdmin() {
             printf("Invalid password. Must be at least 8 characters long.\n");
         }
     }
-
     numAdmins++;
     saveAdminData();
 
@@ -285,58 +260,51 @@ void registerAdmin() {
     printf("You can now login.\n");
 }
 
-// Admin Login
-int loginAdmin() {
+int loginAdmin() {               // Admin login function
     if (numAdmins == 0) {
         printf("ERROR: No admins registered. Please register first.\n");
         return 0;
     }
-
     printf("\n------- Admin Login -------\n");
-
+    
     char input_name[NAME_LEN];
     char input_password[PASSWORD_LEN];
 
-    printf("Enter Admin Name: ");
+    printf("Enter Admin Name: ");      // Get admin name
     if (fgets(input_name, sizeof(input_name), stdin) == NULL) {
         printf("Error reading name.\n");
         return 0;
     }
     input_name[strcspn(input_name, "\n")] = 0;
 
-    // Trim whitespace
-    char *start = input_name;
+    char *start = input_name;         // Trim leading spaces
     while (*start == ' ') start++;
     char *end = start + strlen(start) - 1;
     while (end > start && *end == ' ') end--;
     *(end + 1) = 0;
     strcpy(input_name, start);
 
-    printf("Enter Password: ");
+    printf("Enter Password: ");        // Get admin password
     if (fgets(input_password, sizeof(input_password), stdin) == NULL) {
         printf("Error reading password.\n");
         return 0;
     }
     input_password[strcspn(input_password, "\n")] = 0;
 
-    // Check credentials
-    for (int i = 0; i < numAdmins; i++) {
+    for (int i = 0; i < numAdmins; i++) {           // Check credentials
         if (strcmp(admins[i].name, input_name) == 0 &&
             strcmp(admins[i].password, input_password) == 0) {
             printf("Login successful! Welcome, %s!\n", admins[i].name);
             return 1;
         }
     }
-
     printf("ERROR: No matching credentials found.\n");
     printf("Please check your username and password.\n");
     return 0;
 }
 
-//Admin Menu
-void adminMenu() {
+void adminMenu() {                  // Admin menu function
     int choice;
-
     while (1) {
         printf("\n========== ADMIN PANEL ==========\n");
         printf("1. View All Vehicles\n");
@@ -354,7 +322,6 @@ void adminMenu() {
             continue;
         }
         clearInputBuffer();
-
         switch (choice) {
             case 1:
                 viewAllVehicles();
@@ -380,8 +347,7 @@ void adminMenu() {
     }
 }
 
-// Add Vehicle
-void addVehicle() {
+void addVehicle() {          // Add new vehicle
 
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
@@ -390,8 +356,7 @@ void addVehicle() {
     int ownerId;
     char temp_input[200];
 
-    // License Plate
-    printf("Enter License Plate: ");
+    printf("Enter License Plate: ");       // Get license plate
     fgets(licensePlate, sizeof(licensePlate), stdin);
     licensePlate[strcspn(licensePlate, "\n")] = 0;
 
@@ -400,24 +365,20 @@ void addVehicle() {
         return;
     }
 
-    // Vehicle Type
-    printf("Enter Vehicle Type (Car/Bike/etc): ");
+    printf("Enter Vehicle Type (Car/Bike/etc): ");       // Get vehicle type
     fgets(vehicleType, sizeof(vehicleType), stdin);
     vehicleType[strcspn(vehicleType, "\n")] = 0;
 
-    // Owner Name
-    while (1) {
+    while (1) {                     // Get owner name
         printf("Enter Owner Name: ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
             continue;
         }
 
-        // Remove newline and trim whitespace
-        temp_input[strcspn(temp_input, "\n")] = 0;
+        temp_input[strcspn(temp_input, "\n")] = 0;       // Remove newline character
 
-        // Trim leading/trailing spaces
-        char *start = temp_input;
+        char *start = temp_input;               // Trim leading spaces
         while (*start == ' ') start++;
         char *end = start + strlen(start) - 1;
         while (end > start && *end == ' ') end--;
@@ -427,12 +388,12 @@ void addVehicle() {
             strcpy(users[numUsers].name, start);
             break;
         } else {
-            printf("Invalid name. Please enter a valid name (letters and spaces only, 2-49 characters).\n");
+            printf("Invalid name. Please enter a valid name (letters and spaces only).\n");
         }
     }
+    users[numUsers].userId = nextUserId++;
 
-    // Owner Contact
-    while (1) {
+    while (1) {                      // Get owner phone number
         printf("Enter Phone Number (exactly 11 digits starting with '01'): ");
         if (fgets(temp_input, sizeof(temp_input), stdin) == NULL) {
             printf("Error reading input. Please try again.\n");
@@ -448,8 +409,7 @@ void addVehicle() {
         }
     }
 
-    // Add new vehicle
-    generateVehicleId(vehicleId);
+    generateVehicleId(vehicleId);           // Generate unique vehicle ID
     strcpy(vehicles[numVehicles].vehicleId, vehicleId);
     strcpy(vehicles[numVehicles].licensePlate, licensePlate);
     strcpy(vehicles[numVehicles].ownerName, users[numUsers].name);
@@ -466,13 +426,11 @@ void addVehicle() {
     printf("Vehicle added successfully. ID: %s\n", vehicleId);
 }
 
-// Park Vehicle
-void parkVehicle() {
+void parkVehicle() {           // Park a vehicle
     if (numVehicles == 0) {
         printf("No vehicles registered.\n");
         return;
     }
-
     printf("\n------- Park Vehicle -------\n");
 
     char vehicleId[VEHICLE_ID_LEN];
@@ -500,15 +458,13 @@ void parkVehicle() {
         return;
     }
 
-    // Park the vehicle
-    vehicles[vehicleIndex].isParked = 1;
+    vehicles[vehicleIndex].isParked = 1;             // Mark vehicle as parked
     vehicles[vehicleIndex].spotNumber = availableSpot;
     vehicles[vehicleIndex].entryTime = time(NULL);
 
     spots[availableSpot - 1].isOccupied = 1;
     strcpy(spots[availableSpot - 1].vehicleId, vehicleId);
     spots[availableSpot - 1].entryTime = time(NULL);
-
     saveVehicleData();
     saveParkingData();
 
@@ -519,8 +475,7 @@ void parkVehicle() {
     printf("Entry Time: %s", ctime(&vehicles[vehicleIndex].entryTime));
 }
 
-// Unpark Vehicle
-void unparkVehicle() {
+void unparkVehicle() {              // Unpark a vehicle
     printf("\n------- Unpark Vehicle -------\n");
 
     char vehicleId[VEHICLE_ID_LEN];
@@ -541,12 +496,10 @@ void unparkVehicle() {
         printf("ERROR: Vehicle is not currently parked.\n");
         return;
     }
-
     int spotNumber = vehicles[vehicleIndex].spotNumber;
     double parkingFee = calculateParkingFee(vehicles[vehicleIndex].entryTime);
 
-    // Unpark the vehicle
-    vehicles[vehicleIndex].isParked = 0;
+    vehicles[vehicleIndex].isParked = 0;               // Mark vehicle as unparked
     int oldSpotNumber = vehicles[vehicleIndex].spotNumber;
     vehicles[vehicleIndex].spotNumber = 0;
     vehicles[vehicleIndex].entryTime = 0;
@@ -555,7 +508,6 @@ void unparkVehicle() {
     strcpy(spots[oldSpotNumber - 1].vehicleId, "");
     spots[oldSpotNumber - 1].entryTime = 0;
     spots[oldSpotNumber - 1].parkingFee = parkingFee;
-
     saveVehicleData();
     saveParkingData();
 
@@ -567,19 +519,17 @@ void unparkVehicle() {
     printf("Thank you for using our parking service!\n");
 }
 
-void displayParkingStatus() {
+void displayParkingStatus() {                   // Display current parking status
     printf("\n========== PARKING STATUS ==========\n");
 
     int occupied = 0;
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
         if (spots[i].isOccupied) occupied++;
     }
-
     printf("Total Spots: %d\n", MAX_PARKING_SPOTS);
     printf("Occupied: %d\n", occupied);
     printf("Available: %d\n", MAX_PARKING_SPOTS - occupied);
     printf("Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
-
     printf("\n--- Spot Details ---\n");
     printf("%-4s %-10s %-15s %-20s %-15s\n", "Spot", "Status", "Vehicle ID", "License Plate", "Duration");
     printf("-----------------------------------------------------------------------\n");
@@ -587,7 +537,6 @@ void displayParkingStatus() {
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
         printf("%-4d %-10s", spots[i].spotNumber,
                spots[i].isOccupied ? "OCCUPIED" : "AVAILABLE");
-
         if (spots[i].isOccupied) {
             int vehicleIndex = findVehicleById(spots[i].vehicleId);
             if (vehicleIndex != -1) {
@@ -603,7 +552,7 @@ void displayParkingStatus() {
     }
 }
 
-void generateReport() {
+void generateReport() {           // Generate parking report
     printf("\n========== PARKING REPORT ==========\n");
 
     time_t currentTime = time(NULL);
@@ -616,13 +565,11 @@ void generateReport() {
         return;
     }
 
-    // Write report header
-    fprintf(fp, "=== PARKING LOT MANAGEMENT REPORT ===\n");
+    fprintf(fp, "=== PARKING LOT MANAGEMENT REPORT ===\n");               // Write report header
     fprintf(fp, "Generated on: %s\n", ctime(&currentTime));
     fprintf(fp, "==========================================\n\n");
 
-    // System statistics
-    int occupied = 0;
+    int occupied = 0;             // Count occupied spots and calculate revenue
     double totalRevenue = 0.0;
 
     for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
@@ -631,20 +578,16 @@ void generateReport() {
             totalRevenue += calculateParkingFee(spots[i].entryTime);
         }
     }
-
     fprintf(fp, "SYSTEM STATISTICS:\n");
     fprintf(fp, "Total Parking Spots: %d\n", MAX_PARKING_SPOTS);
     fprintf(fp, "Occupied Spots: %d\n", occupied);
     fprintf(fp, "Available Spots: %d\n", MAX_PARKING_SPOTS - occupied);
     fprintf(fp, "Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
     fprintf(fp, "Estimated Current Revenue: $%.2f\n\n", totalRevenue);
-
     fprintf(fp, "USER STATISTICS:\n");
     fprintf(fp, "Registered Vehicles: %d\n", numVehicles);
     fprintf(fp, "Registered Admins: %d\n\n", numAdmins);
-
-    // Currently parked vehicles
-    fprintf(fp, "CURRENTLY PARKED VEHICLES:\n");
+    fprintf(fp, "CURRENTLY PARKED VEHICLES:\n");              // Write currently parked vehicles`
     fprintf(fp, "%-4s %-15s %-15s %-20s %-10s %-15s\n",
             "Spot", "Vehicle ID", "License", "Owner", "Type", "Duration(hrs)");
     fprintf(fp, "--------------------------------------------------------------------------------\n");
@@ -669,9 +612,7 @@ void generateReport() {
 
     printf("Report generated successfully!\n");
     printf("Report saved as: %s\n", filename);
-
-    // Display summary on screen
-    printf("\nREPORT SUMMARY:\n");
+    printf("\nREPORT SUMMARY:\n");                   // Display summary on screen
     printf("Total Spots: %d\n", MAX_PARKING_SPOTS);
     printf("Occupied: %d\n", occupied);
     printf("Available: %d\n", MAX_PARKING_SPOTS - occupied);
@@ -679,7 +620,7 @@ void generateReport() {
     printf("Current Revenue: $%.2f\n", totalRevenue);
 }
 
-void viewAllUsers() {
+void viewAllUsers() {              // View all registered users
     printf("\n========== ALL USERS ==========\n");
     if (numUsers == 0)
     {
