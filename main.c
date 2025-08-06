@@ -593,7 +593,7 @@ void generateReport() {
     char filename[100];
     sprintf(filename, "reports/report_%ld.txt", currentTime);
 
-    FILE *fp = fopen(filename, "w");
+    FILE *fp = fopen(filename, "a");
     if (fp == NULL) {
         printf("Error creating report file.\n");
         return;
@@ -819,7 +819,7 @@ void debugShowAllAdmins() {
 
 // Admin Data
 void saveAdminData() {
-    FILE *fp = fopen("admin/data.txt", "w");
+    FILE *fp = fopen("admin/data.txt", "a");
     if (fp == NULL) {
         printf("ERROR: Cannot create/open admin data file!\n");
         return;
@@ -839,7 +839,7 @@ void saveAdminData() {
 
 // User Data
 void saveUserData() {
-    FILE *fp = fopen("users/data.txt", "w");
+    FILE *fp = fopen("users/data.txt", "a");
     if (fp == NULL) {
         printf("ERROR: Cannot create/open user data file!\n");
         return;
@@ -859,7 +859,7 @@ void saveUserData() {
 
 // Vehicle Data
 void saveVehicleData() {
-    FILE *fp = fopen("vehicles/data.txt", "w");
+    FILE *fp = fopen("vehicles/data.txt", "a");
     if (fp == NULL) {
         printf("ERROR: Cannot create/open vehicle data file!\n");
         return;
@@ -883,7 +883,7 @@ void saveVehicleData() {
 
 // Parking Data
 void saveParkingData() {
-    FILE *fp = fopen("parking/data.txt", "w");
+    FILE *fp = fopen("parking/data.txt", "a");
     if (fp == NULL) {
         printf("ERROR: Cannot create/open parking data file!\n");
         return;
