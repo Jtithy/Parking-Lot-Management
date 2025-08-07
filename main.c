@@ -1162,12 +1162,9 @@ double calculateParkingFee(time_t entryTime) {
     double hoursParked = secondsParked / 3600.0;
     double ratePerHour = 100.0;
 
-    // Minimum and Maximum hours
+    // Minimum hours
     if (hoursParked < 1) {
         hoursParked = 1;
-    }
-    if (hoursParked > 24) {
-        hoursParked = 24;
     }
     // Calculate total fee
     double totalFee = hoursParked * ratePerHour;
