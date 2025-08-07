@@ -1155,10 +1155,22 @@ void generateVehicleId(char *vehicleId) {
 }
 
 double calculateParkingFee(time_t entryTime) {
-    time_t currentTime = time(NULL);
-    double hours = difftime(currentTime, entryTime) / 3600.0;
+    time_t exitTime = time(NULL);
 
-    // Parking fee structure: TK 100 per hour
-    double fee = hours * 100.0;
-    return (fee < 100.0) ? 100.0 : fee;
+    // Calculate difference in seconds
+    double secondsParked = difftime(exitTime, entryTime);
+    double hoursParked = secondsParked / 3600.0;
+    double ratePerHour = 100.0;
+
+    // Minimum and Maximum hours
+    if (hoursParked < 1) {
+        hoursParked = 1;
+    }
+    if (hoursParked > 24) {
+        hoursParked = 24;
+    }
+    // Calculate total fee
+    double totalFee = hoursParked * ratePerHour;
+
+    return totalFee;
 }
