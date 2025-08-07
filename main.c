@@ -39,12 +39,12 @@ typedef struct {
 typedef struct {           
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
+    char ownerId[USER_ID_LEN];
     char ownerName[NAME_LEN];
     char ownerPhoneNumber[CONTACT_LEN];
     char vehicleType[VEHICLE_TYPE_LEN];
     int isParked;
     int spotNumber;
-    int ownerId;
     time_t entryTime;
 } Vehicle;
 
@@ -443,10 +443,10 @@ void addVehicle() {
     strcpy(vehicles[numVehicles].ownerName, users[numUsers].name);
     strcpy(vehicles[numVehicles].vehicleType, vehicleType);
     strcpy(vehicles[numVehicles].ownerPhoneNumber, users[numUsers].phoneNumber);
+    strcpy(vehicles[numVehicles].ownerId, users[numUsers].userId); // Link vehicle to user
     vehicles[numVehicles].isParked = 0;
     vehicles[numVehicles].spotNumber = 0;
     vehicles[numVehicles].entryTime = 0;
-    vehicles[numVehicles].ownerId = numUsers; // Link vehicle to user
 
     numVehicles++;
     saveVehicleData();
@@ -1017,7 +1017,7 @@ void loadVehicleData() {
         if (token) vehicles[i].spotNumber = atoi(token);
 
         token = strtok(NULL, "|");
-        if (token) vehicles[i].ownerId = atoi(token);
+        if (token) strcpy(vehicles[i].ownerId, token);
 
         token = strtok(NULL, "|");
         if (token) vehicles[i].entryTime = atol(token);
