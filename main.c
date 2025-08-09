@@ -6,14 +6,14 @@
 
 // Constants
 #define MAX_ADMINS 10
-#define MAX_USERS 100
+#define MAX_OWNERS 100
 #define MAX_VEHICLES 200
 #define MAX_PARKING_SPOTS 50
 #define NAME_LEN 50
 #define EMAIL_LEN 20
 #define CONTACT_LEN 12
 #define PASSWORD_LEN 50
-#define USER_ID_LEN 20
+#define OWNER_ID_LEN 20
 #define VEHICLE_ID_LEN 20
 #define LICENSE_PLATE_LEN 15
 #define VEHICLE_TYPE_LEN 20
@@ -26,20 +26,20 @@ typedef struct {
     char password[PASSWORD_LEN];
 } Admin;
 
-// For User
-typedef struct {  
-    char userId[USER_ID_LEN];        
+// For Owner
+typedef struct {
+    char ownerId[OWNER_ID_LEN];
     char name[NAME_LEN];
     char vehicleID[VEHICLE_ID_LEN];
     char phoneNumber[CONTACT_LEN];
 
-} User;
+} Owner;
 
 // For Vehicle
 typedef struct {           
     char vehicleId[VEHICLE_ID_LEN];
     char licensePlate[LICENSE_PLATE_LEN];
-    char ownerId[USER_ID_LEN];
+    char ownerId[OWNER_ID_LEN];
     char ownerName[NAME_LEN];
     char ownerPhoneNumber[CONTACT_LEN];
     char vehicleType[VEHICLE_TYPE_LEN];
@@ -59,11 +59,11 @@ typedef struct {
 
 // Global variables
 Admin admins[MAX_ADMINS];     
-User users[MAX_USERS];
+Owner owners[MAX_OWNERS];
 Vehicle vehicles[MAX_VEHICLES];
 ParkingSpot spots[MAX_PARKING_SPOTS];
 int numAdmins = 0;
-int numUsers = 0;
+int numOwners = 0;
 int numVehicles = 0;
 
 // Function prototypes
@@ -73,11 +73,11 @@ void adminMenu();
 int loginAdmin();
 void registerAdmin();
 void saveAdminData();
-void saveUserData();
+void saveOwnerData();
 void saveVehicleData();
 void saveParkingData();
 void loadAdminData();
-void loadUserData();
+void loadOwnerData();
 void loadVehicleData();
 void loadParkingData();
 void addVehicle();
@@ -85,11 +85,11 @@ void parkVehicle();
 void unparkVehicle();
 void displayParkingStatus();
 void generateReport();
-void manageUsers();
+void manageOwners();
 void manageVehicles();
-void viewAllUsers();
+void viewAllOwners();
 void viewAllVehicles();
-void deleteUser();
+void deleteOwner();
 void deleteVehicle();
 double calculateParkingFee(time_t entryTime);
 
@@ -101,10 +101,10 @@ int isValidPassword(char *password);
 int isValidLicensePlate(char *plate);
 void clearInputBuffer();
 void createDirectories();
-int findUserById(char *userId);
+int findOwnerById(char *ownerId);
 int findVehicleById(char *vehicleId);
 int findAvailableSpot();
-void generateUserId(char *userId);
+void generateOwnerId(char *ownerId);
 void generateVehicleId(char *vehicleId);
 
 // Debugging function
@@ -127,7 +127,7 @@ void initializeSystem() {
     }
     createDirectories();
     loadAdminData();
-    loadUserData();
+    loadOwnerData();
     loadVehicleData();
     loadParkingData();
 
@@ -141,12 +141,12 @@ void initializeSystem() {
 void createDirectories() {       
     #ifdef _WIN32
         system("mkdir admin >nul 2>&1");
-        system("mkdir users >nul 2>&1");
+        system("mkdir owners >nul 2>&1");
         system("mkdir vehicles >nul 2>&1");
         system("mkdir parking >nul 2>&1");
         system("mkdir reports >nul 2>&1");
     #else
-        system("mkdir -p admin users vehicles parking reports 2>/dev/null");
+        system("mkdir -p admin owners vehicles parking reports 2>/dev/null");
     #endif
 }
 
@@ -322,7 +322,7 @@ int loginAdmin() {
         }
     }
     printf("ERROR: No matching admin found.\n");
-    printf("Please check your username and password.\n");
+    printf("Please check your owner name and password.\n");
     return 0;
 }
 
@@ -334,7 +334,7 @@ void adminMenu() {
         printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
         printf("3. Generate Report\n");
-        printf("4. View All Users\n");
+        printf("4. View All Owners\n");
         printf("5. Logout\n");
         printf("=================================\n");
         printf("Enter your choice: ");
@@ -356,7 +356,7 @@ void adminMenu() {
                 generateReport();
                 break;
             case 4:
-                viewAllUsers();
+                viewAllOwners();
                 break;
             case 5:
                 printf("Logged out successfully.\n");
@@ -411,13 +411,13 @@ void addVehicle() {
         *(end + 1) = 0;
 
         if (isValidName(start)) {
-            strcpy(users[numUsers].name, start);
+            strcpy(owners[numOwners].name, start);
             break;
         } else {
             printf("Invalid name. Please enter a valid name (letters and spaces only).\n");
         }
     }
-    generateUserId(users[numUsers].userId);
+    generateOwnerId(owners[numOwners].ownerId);
 
     // Get owner phone number
     while (1) {                      
@@ -429,7 +429,7 @@ void addVehicle() {
         temp_input[strcspn(temp_input, "\n")] = 0;
 
         if (isValidPhoneNumber(temp_input)) {
-            strcpy(users[numUsers].phoneNumber, temp_input);
+            strcpy(owners[numOwners].phoneNumber, temp_input);
             break;
         } else {
             printf("Invalid phone number. Must be exactly 11 digits starting with '01'.\n");
@@ -440,10 +440,10 @@ void addVehicle() {
     generateVehicleId(vehicleId);           
     strcpy(vehicles[numVehicles].vehicleId, vehicleId);
     strcpy(vehicles[numVehicles].licensePlate, licensePlate);
-    strcpy(vehicles[numVehicles].ownerName, users[numUsers].name);
+    strcpy(vehicles[numVehicles].ownerName, owners[numOwners].name);
     strcpy(vehicles[numVehicles].vehicleType, vehicleType);
-    strcpy(vehicles[numVehicles].ownerPhoneNumber, users[numUsers].phoneNumber);
-    strcpy(vehicles[numVehicles].ownerId, users[numUsers].userId); // Link vehicle to user
+    strcpy(vehicles[numVehicles].ownerPhoneNumber, owners[numOwners].phoneNumber);
+    strcpy(vehicles[numVehicles].ownerId, owners[numOwners].ownerId); // Link vehicle to owner
     vehicles[numVehicles].isParked = 0;
     vehicles[numVehicles].spotNumber = 0;
     vehicles[numVehicles].entryTime = 0;
@@ -619,7 +619,7 @@ void generateReport() {
     fprintf(fp, "Available Spots: %d\n", MAX_PARKING_SPOTS - occupied);
     fprintf(fp, "Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
     fprintf(fp, "Estimated Current Revenue: TK- %.2f/=\n\n", totalRevenue);
-    fprintf(fp, "USER STATISTICS:\n");
+    fprintf(fp, "OWNER STATISTICS:\n");
     fprintf(fp, "Registered Vehicles: %d\n", numVehicles);
     fprintf(fp, "Registered Admins: %d\n\n", numAdmins);
     // Write currently parked vehicles`
@@ -657,27 +657,26 @@ void generateReport() {
     printf("Current Revenue: TK- %.2f/=\n", totalRevenue);
 }
 
-// View all registered users
-void viewAllUsers() {              
-    printf("\n========== ALL USERS ==========\n");
-    if (numUsers == 0)
-    {
-        printf("No users to display.\n");
+// View all registered owners
+void viewAllOwners() {
+    printf("\n========== ALL OWNERS ==========\n");
+    if (numVehicles == 0) {
+        printf("No owners to display.\n");
         return;
     }
 
-    printf("\n===== Registered Users =====\n");
-    printf("%-5s %-15s %-25s %-15s %-15s\n", "No.", "User ID", "Name", "Contact", "Vehicle ID");
+    printf("\n===== Registered Owners =====\n");
+    printf("%-5s %-15s %-25s %-15s %-15s\n", "No.", "Owner ID", "Name", "Contact", "Vehicle ID");
     printf("-------------------------------------------------------------\n");
 
-    for (int i = 0; i < numUsers; i++)
+    for (int i = 0; i < numOwners; i++)
     {
         printf("%-5s %-15s %-25s %-15s %-15s\n",
                i + 1,
-               users[i].userId,
-               users[i].name,
-               users[i].phoneNumber,
-               users[i].vehicleID);
+               owners[i].ownerId,
+               owners[i].name,
+               owners[i].phoneNumber,
+               owners[i].vehicleID);
     }
 
 }
@@ -837,21 +836,21 @@ void saveAdminData() {
     fclose(fp);
 }
 
-// User Data
-void saveUserData() {
-    FILE *fp = fopen("users/data.txt", "a");
+// Owner Data
+void saveOwnerData() {
+    FILE *fp = fopen("owners/data.txt", "a");
     if (fp == NULL) {
-        printf("ERROR: Cannot create/open user data file!\n");
+        printf("ERROR: Cannot create/open owner data file!\n");
         return;
     }
-//fprintf(fp, "%s %s %s %s\n", userID, name, contact, vehicleID);
-    fprintf(fp, "%d\n", numUsers);
-    for (int i = 0; i < numUsers; i++) {
+//fprintf(fp, "%s %s %s %s\n", ownerID, name, contact, vehicleID);
+    fprintf(fp, "%d\n", numOwners);
+    for (int i = 0; i < numOwners; i++) {
         fprintf(fp, "%s|%s|%s|%s\n",
-                users[i].userId,
-                users[i].name,
-                users[i].phoneNumber,
-                users[i].vehicleID);
+                owners[i].ownerId,
+                owners[i].name,
+                owners[i].phoneNumber,
+                owners[i].vehicleID);
     }
 
     fclose(fp);
@@ -941,16 +940,16 @@ void loadAdminData() {
     fclose(fp);
 }
 
-// User Data
-void loadUserData() {
-    FILE *fp = fopen("users/data.txt", "r");
+// Owner Data
+void loadOwnerData() {
+    FILE *fp = fopen("owners/data.txt", "r");
     if (fp == NULL) {
-        numUsers = 0;
+        numOwners = 0;
         return;
     }
 
-    if (fscanf(fp, "%d", &numUsers) != 1) {
-        numUsers = 0;
+    if (fscanf(fp, "%d", &numOwners) != 1) {
+        numOwners = 0;
         fclose(fp);
         return;
     }
@@ -958,19 +957,19 @@ void loadUserData() {
     char line[300];
     fgets(line, sizeof(line), fp); // consume newline
 
-    for (int i = 0; i < numUsers; i++) {
+    for (int i = 0; i < numOwners; i++) {
         if (fgets(line, sizeof(line), fp) == NULL) break;
 
         line[strcspn(line, "\n")] = 0;
 
         char *token = strtok(line, "|");
-        if (token) strcpy(users[i].name, token);
+        if (token) strcpy(owners[i].name, token);
 
         token = strtok(NULL, "|");
-        if (token) strcpy(users[i].phoneNumber, token);
+        if (token) strcpy(owners[i].phoneNumber, token);
 
         token = strtok(NULL, "|");
-        if (token) strcpy(users[i].vehicleID, token);
+        if (token) strcpy(owners[i].vehicleID, token);
     }
 
     fclose(fp);
@@ -1117,9 +1116,9 @@ void clearInputBuffer() {
     while ((c = getchar()) != '\n' && c != EOF);
 }
 
-int findUserById(char *userId) {
-    for (int i = 0; i < numUsers; i++) {
-        if (strcmp(users[i].userId, userId) == 0) {
+int findOwnerById(char *ownerId) {
+    for (int i = 0; i < numOwners; i++) {
+        if (strcmp(owners[i].ownerId, ownerId) == 0) {
             return i;
         }
     }
@@ -1144,9 +1143,9 @@ int findAvailableSpot() {
     return -1;
 }
 
-void generateUserId(char *userId) {
-    static int userCounter = 1;
-    sprintf(userId, "USR%04d", userCounter++);
+void generateOwnerId(char *ownerId) {
+    static int ownerCounter = 1;
+    sprintf(ownerId, "OWN%04d", ownerCounter++);
 }
 
 void generateVehicleId(char *vehicleId) {
