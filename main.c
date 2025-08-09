@@ -450,6 +450,7 @@ void addVehicle() {
 
     numVehicles++;
     saveVehicleData();
+    saveOwnerData();
 
     printf("Vehicle added successfully. ID: %s\n", vehicleId);
 }
@@ -788,6 +789,7 @@ void deleteVehicle() {
         numVehicles--;
 
         saveVehicleData();
+        saveOwnerData();
         saveParkingData();
         printf("Vehicle deleted successfully.\n");
     } else {
@@ -954,7 +956,7 @@ void loadOwnerData() {
         return;
     }
 
-    char line[300];
+    char line[1000];
     fgets(line, sizeof(line), fp); // consume newline
 
     for (int i = 0; i < numOwners; i++) {
@@ -963,6 +965,9 @@ void loadOwnerData() {
         line[strcspn(line, "\n")] = 0;
 
         char *token = strtok(line, "|");
+        if (token) strcpy(owners[i].ownerId, token);
+
+        token = strtok(NULL, "|");
         if (token) strcpy(owners[i].name, token);
 
         token = strtok(NULL, "|");
@@ -989,7 +994,7 @@ void loadVehicleData() {
         return;
     }
 
-    char line[500];
+    char line[1000];
     fgets(line, sizeof(line), fp); // consume newline
 
     for (int i = 0; i < numVehicles; i++) {
