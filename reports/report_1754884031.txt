@@ -1,0 +1,19 @@
+=== PARKING LOT MANAGEMENT REPORT ===
+Generated on: Mon Aug 11 09:47:11 2025
+
+==========================================
+
+SYSTEM STATISTICS:
+Total Parking Spots: 50
+Occupied Spots: 1
+Available Spots: 49
+Occupancy Rate: 2.0%
+Estimated Current Revenue: TK- 1532.75/=
+
+OWNER STATISTICS:
+Registered Vehicles: 0
+Registered Admins: 1
+
+CURRENTLY PARKED VEHICLES:
+Spot Vehicle ID      License         Owner                Type       Duration(hrs)  
+--------------------------------------------------------------------------------
