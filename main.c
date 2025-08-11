@@ -69,9 +69,9 @@ int numVehicles = 0;
 // Function prototypes
 void initializeSystem();     
 void mainMenu();
-void adminMenu();
-int loginAdmin();
 void registerAdmin();
+int loginAdmin();
+void adminMenu();
 void saveAdminData();
 void loadAdminData();
 void manageVehicles();
@@ -91,10 +91,6 @@ void loadParkingData();
 void displayParkingStatus();
 void generateReport();
 
-
-
-double calculateParkingFee(time_t entryTime);
-
 // Validation functions
 int isValidName(char *name);        
 int isValidEmail(char *email);
@@ -108,6 +104,7 @@ int findVehicleById(char *vehicleId);
 int findAvailableSpot();
 void generateOwnerId(char *ownerId);
 void generateVehicleId(char *vehicleId);
+double calculateParkingFee(time_t entryTime);
 
 // Debugging function
 void debugShowAllAdmins();         
@@ -369,6 +366,106 @@ void adminMenu() {
     }
 }
 
+// Admin Data Management
+void saveAdminData() {
+    FILE *fp = fopen("admin/data.txt", "a");
+    if (fp == NULL) {
+        printf("ERROR: Cannot create/open admin data file!\n");
+        return;
+    }
+
+    fprintf(fp, "%d\n", numAdmins);
+    for (int i = 0; i < numAdmins; i++) {
+        fprintf(fp, "%s|%s|%s|%s\n",
+                admins[i].name,
+                admins[i].phoneNumber,
+                admins[i].email,
+                admins[i].password);
+    }
+
+    fclose(fp);
+}
+
+// Admin Data
+void loadAdminData() {
+    FILE *fp = fopen("admin/data.txt", "r");
+    if (fp == NULL) {
+        numAdmins = 0;
+        return;
+    }
+
+    if (fscanf(fp, "%d", &numAdmins) != 1) {
+        numAdmins = 0;
+        fclose(fp);
+        return;
+    }
+
+    char line[500];
+    fgets(line, sizeof(line), fp); // consume newline
+
+    for (int i = 0; i < numAdmins; i++) {
+        if (fgets(line, sizeof(line), fp) == NULL) break;
+
+        line[strcspn(line, "\n")] = 0;
+
+        char *token = strtok(line, "|");
+        if (token) strcpy(admins[i].name, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(admins[i].phoneNumber, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(admins[i].email, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(admins[i].password, token);
+    }
+
+    fclose(fp);
+}
+
+// Manage vehicles menu
+void manageVehicles() {
+    int choice;
+    printf("\n========== MANAGE VEHICLES ==========\n");
+    printf("1. View All Vehicles\n");
+    printf("2. Add Vehicles\n");
+    printf("3. Park Vehicle\n");
+    printf("4. Unpark Vehicle\n");
+    printf("5. Delete Vehicles\n");
+    printf("6. Back to Admin Menu\n");
+    printf("Enter choice: ");
+
+    if (scanf("%d", &choice) != 1) {
+        printf("Invalid input.\n");
+        clearInputBuffer();
+        return;
+    }
+    clearInputBuffer();
+
+    switch (choice) {
+        case 1:
+            viewAllVehicles();
+            break;
+        case 2:
+            addVehicle();
+            break;
+        case 3:
+            parkVehicle();
+            break;
+        case 4:
+            unparkVehicle();
+            break;
+        case 5:
+            deleteVehicle();
+            break;
+        case 6:
+            return;
+        default:
+            printf("Invalid choice.\n");
+    }
+}
+
 // Add new vehicle
 void addVehicle() {          
 
@@ -554,6 +651,288 @@ void unparkVehicle() {
     printf("Thank you for using our parking service!\n");
 }
 
+// Delete Vehicle
+void deleteVehicle() {
+    if (numVehicles == 0) {
+        printf("No vehicles to delete.\n");
+        return;
+    }
+
+    viewAllVehicles();
+
+    char vehicleId[VEHICLE_ID_LEN];
+    printf("Enter Vehicle ID to delete: ");
+    if (fgets(vehicleId, sizeof(vehicleId), stdin) == NULL) {
+        printf("Error reading vehicle ID.\n");
+        return;
+    }
+    vehicleId[strcspn(vehicleId, "\n")] = 0;
+
+    int vehicleIndex = findVehicleById(vehicleId);
+    if (vehicleIndex == -1) {
+        printf("Vehicle not found.\n");
+        return;
+    }
+
+    printf("Are you sure you want to delete vehicle %s? (y/n): ", vehicleId);
+    char confirm;
+    scanf(" %c", &confirm);
+    clearInputBuffer();
+
+    if (confirm == 'y' || confirm == 'Y') {
+        if (vehicles[vehicleIndex].isParked) {
+            spots[vehicles[vehicleIndex].spotNumber - 1].isOccupied = 0;
+            strcpy(spots[vehicles[vehicleIndex].spotNumber - 1].vehicleId, "");
+        }
+
+        // Shift vehicles array
+        for (int i = vehicleIndex; i < numVehicles - 1; i++) {
+            vehicles[i] = vehicles[i + 1];
+        }
+        numVehicles--;
+
+        saveVehicleData();
+        saveOwnerData();
+        saveParkingData();
+        printf("Vehicle deleted successfully.\n");
+    } else {
+        printf("Vehicle deletion cancelled.\n");
+    }
+}
+
+// Vehicle Data Append
+void saveVehicleData() {
+    FILE *fp = fopen("vehicles/data.txt", "a");
+    if (fp == NULL) {
+        printf("ERROR: Cannot create/open vehicle data file!\n");
+        return;
+    }
+
+    fprintf(fp, "%d\n", numVehicles);
+    for (int i = 0; i < numVehicles; i++) {
+        fprintf(fp, "%s|%s|%s|%s|%d|%d|%s|%ld\n",
+                vehicles[i].vehicleId,
+                vehicles[i].licensePlate,
+                vehicles[i].ownerName,
+                vehicles[i].vehicleType,
+                vehicles[i].isParked,
+                vehicles[i].spotNumber,
+                vehicles[i].ownerPhoneNumber,
+                vehicles[i].entryTime);
+    }
+
+    fclose(fp);
+}
+
+// Vehicle Data Read
+void loadVehicleData() {
+    FILE *fp = fopen("vehicles/data.txt", "r");
+    if (fp == NULL) {
+        numVehicles = 0;
+        return;
+    }
+
+    if (fscanf(fp, "%d", &numVehicles) != 1) {
+        numVehicles = 0;
+        fclose(fp);
+        return;
+    }
+
+    char line[1000];
+    fgets(line, sizeof(line), fp); // consume newline
+
+    for (int i = 0; i < numVehicles; i++) {
+        if (fgets(line, sizeof(line), fp) == NULL) break;
+
+        line[strcspn(line, "\n")] = 0;
+
+        char *token = strtok(line, "|");
+        if (token) strcpy(vehicles[i].vehicleId, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(vehicles[i].licensePlate, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(vehicles[i].ownerName, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(vehicles[i].vehicleType, token);
+
+        token = strtok(NULL, "|");
+        if (token) vehicles[i].isParked = atoi(token);
+
+        token = strtok(NULL, "|");
+        if (token) vehicles[i].spotNumber = atoi(token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(vehicles[i].ownerId, token);
+
+        token = strtok(NULL, "|");
+        if (token) vehicles[i].entryTime = atol(token);
+    }
+
+    fclose(fp);
+}
+
+void viewAllVehicles() {
+    printf("\n========== ALL VEHICLES ==========\n");
+    if (numVehicles == 0) {
+        printf("No vehicles registered.\n");
+        return;
+    }
+
+    printf("%-15s %-15s %-20s %-15s %-8s %-5s %-11s\n",
+           "Vehicle ID", "License", "Owner", "Type", "Parked", "Spot", "Owner Phone Number");
+    printf("-------------------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < numVehicles; i++) {
+        printf("%-15s %-15s %-20s %-15s %-8s %-5d %-11s\n",
+               vehicles[i].vehicleId,
+               vehicles[i].licensePlate,
+               vehicles[i].ownerName,
+               vehicles[i].vehicleType,
+               vehicles[i].isParked ? "Yes" : "No",
+               vehicles[i].spotNumber,
+               vehicles[i].ownerPhoneNumber);
+    }
+}
+
+// Owner Data Append
+void saveOwnerData() {
+    FILE *fp = fopen("owners/data.txt", "a");
+    if (fp == NULL) {
+        printf("ERROR: Cannot create/open owner data file!\n");
+        return;
+    }
+//fprintf(fp, "%s %s %s %s\n", ownerID, name, contact, vehicleID);
+    fprintf(fp, "%d\n", numOwners);
+    for (int i = 0; i < numOwners; i++) {
+        fprintf(fp, "%s|%s|%s|%s\n",
+                owners[i].ownerId,
+                owners[i].name,
+                owners[i].phoneNumber,
+                owners[i].vehicleID);
+    }
+
+    fclose(fp);
+}
+
+// Owner Data
+void loadOwnerData() {
+    FILE *fp = fopen("owners/data.txt", "r");
+    if (fp == NULL) {
+        numOwners = 0;
+        return;
+    }
+
+    if (fscanf(fp, "%d", &numOwners) != 1) {
+        numOwners = 0;
+        fclose(fp);
+        return;
+    }
+
+    char line[1000];
+    fgets(line, sizeof(line), fp); // consume newline
+
+    for (int i = 0; i < numOwners; i++) {
+        if (fgets(line, sizeof(line), fp) == NULL) break;
+
+        line[strcspn(line, "\n")] = 0;
+
+        char *token = strtok(line, "|");
+        if (token) strcpy(owners[i].ownerId, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(owners[i].name, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(owners[i].phoneNumber, token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(owners[i].vehicleID, token);
+    }
+
+    fclose(fp);
+}
+
+// View all registered owners
+void viewAllOwners() {
+    printf("\n========== ALL OWNERS ==========\n");
+    if (numOwners == 0) {
+        printf("No owners to display.\n");
+        return;
+    }
+
+    printf("\n===== Registered Owners =====\n");
+    printf("%-5s %-15s %-25s %-15s %-15s\n", "No.", "Owner ID", "Name", "Contact", "Vehicle ID");
+    printf("-------------------------------------------------------------\n");
+
+    for (int i = 0; i < numOwners; i++)
+    {
+        printf("%-5s %-15s %-25s %-15s %-15s\n",
+               i + 1,
+               owners[i].ownerId,
+               owners[i].name,
+               owners[i].phoneNumber,
+               owners[i].vehicleID);
+    }
+
+}
+
+// Parking Data Append
+void saveParkingData() {
+    FILE *fp = fopen("parking/data.txt", "a");
+    if (fp == NULL) {
+        printf("ERROR: Cannot create/open parking data file!\n");
+        return;
+    }
+
+    for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
+        fprintf(fp, "%d|%d|%s|%ld|%.2f\n",
+                spots[i].spotNumber,
+                spots[i].isOccupied,
+                spots[i].vehicleId,
+                spots[i].entryTime,
+                spots[i].parkingFee);
+    }
+
+    fclose(fp);
+}
+
+// Parking Data Read
+void loadParkingData() {
+    FILE *fp = fopen("parking/data.txt", "r");
+    if (fp == NULL) {
+        return;
+    }
+
+    char line[200];
+    int i = 0;
+
+    while (fgets(line, sizeof(line), fp) != NULL && i < MAX_PARKING_SPOTS) {
+        line[strcspn(line, "\n")] = 0;
+
+        char *token = strtok(line, "|");
+        if (token) spots[i].spotNumber = atoi(token);
+
+        token = strtok(NULL, "|");
+        if (token) spots[i].isOccupied = atoi(token);
+
+        token = strtok(NULL, "|");
+        if (token) strcpy(spots[i].vehicleId, token);
+
+        token = strtok(NULL, "|");
+        if (token) spots[i].entryTime = atol(token);
+
+        token = strtok(NULL, "|");
+        if (token) spots[i].parkingFee = atof(token);
+
+        i++;
+    }
+
+    fclose(fp);
+}
+
 // Display current parking status
 void displayParkingStatus() {                  
     printf("\n========== PARKING STATUS ==========\n");
@@ -660,145 +1039,7 @@ void generateReport() {
     printf("Current Revenue: TK- %.2f/=\n", totalRevenue);
 }
 
-// View all registered owners
-void viewAllOwners() {
-    printf("\n========== ALL OWNERS ==========\n");
-    if (numVehicles == 0) {
-        printf("No owners to display.\n");
-        return;
-    }
-
-    printf("\n===== Registered Owners =====\n");
-    printf("%-5s %-15s %-25s %-15s %-15s\n", "No.", "Owner ID", "Name", "Contact", "Vehicle ID");
-    printf("-------------------------------------------------------------\n");
-
-    for (int i = 0; i < numOwners; i++)
-    {
-        printf("%-5s %-15s %-25s %-15s %-15s\n",
-               i + 1,
-               owners[i].ownerId,
-               owners[i].name,
-               owners[i].phoneNumber,
-               owners[i].vehicleID);
-    }
-
-}
-
-void viewAllVehicles() {
-    printf("\n========== ALL VEHICLES ==========\n");
-    if (numVehicles == 0) {
-        printf("No vehicles registered.\n");
-        return;
-    }
-
-    printf("%-15s %-15s %-20s %-15s %-8s %-5s %-11s\n",
-           "Vehicle ID", "License", "Owner", "Type", "Parked", "Spot", "Owner Phone Number");
-    printf("-------------------------------------------------------------------------------------\n");
-
-    for (int i = 0; i < numVehicles; i++) {
-        printf("%-15s %-15s %-20s %-15s %-8s %-5d %-11s\n",
-               vehicles[i].vehicleId,
-               vehicles[i].licensePlate,
-               vehicles[i].ownerName,
-               vehicles[i].vehicleType,
-               vehicles[i].isParked ? "Yes" : "No",
-               vehicles[i].spotNumber,
-               vehicles[i].ownerPhoneNumber);
-    }
-}
-
-// Manage vehicles menu
-void manageVehicles() {
-    int choice;
-    printf("\n========== MANAGE VEHICLES ==========\n");
-    printf("1. View All Vehicles\n");
-    printf("2. Add Vehicles\n");
-    printf("3. Park Vehicle\n");
-    printf("4. Unpark Vehicle\n");
-    printf("5. Delete Vehicles\n");
-    printf("6. Back to Admin Menu\n");
-    printf("Enter choice: ");
-
-    if (scanf("%d", &choice) != 1) {
-        printf("Invalid input.\n");
-        clearInputBuffer();
-        return;
-    }
-    clearInputBuffer();
-
-    switch (choice) {
-        case 1:
-            viewAllVehicles();
-            break;
-        case 2:
-            addVehicle();
-            break;
-        case 3:
-            parkVehicle();
-            break;
-        case 4:
-            unparkVehicle();
-            break;
-        case 5:
-            deleteVehicle();
-            break;
-        case 6:
-            return;
-        default:
-            printf("Invalid choice.\n");
-    }
-}
-
-
-// Delete Vehicle
-void deleteVehicle() {
-    if (numVehicles == 0) {
-        printf("No vehicles to delete.\n");
-        return;
-    }
-
-    viewAllVehicles();
-
-    char vehicleId[VEHICLE_ID_LEN];
-    printf("Enter Vehicle ID to delete: ");
-    if (fgets(vehicleId, sizeof(vehicleId), stdin) == NULL) {
-        printf("Error reading vehicle ID.\n");
-        return;
-    }
-    vehicleId[strcspn(vehicleId, "\n")] = 0;
-
-    int vehicleIndex = findVehicleById(vehicleId);
-    if (vehicleIndex == -1) {
-        printf("Vehicle not found.\n");
-        return;
-    }
-
-    printf("Are you sure you want to delete vehicle %s? (y/n): ", vehicleId);
-    char confirm;
-    scanf(" %c", &confirm);
-    clearInputBuffer();
-
-    if (confirm == 'y' || confirm == 'Y') {
-        if (vehicles[vehicleIndex].isParked) {
-            spots[vehicles[vehicleIndex].spotNumber - 1].isOccupied = 0;
-            strcpy(spots[vehicles[vehicleIndex].spotNumber - 1].vehicleId, "");
-        }
-
-        // Shift vehicles array
-        for (int i = vehicleIndex; i < numVehicles - 1; i++) {
-            vehicles[i] = vehicles[i + 1];
-        }
-        numVehicles--;
-
-        saveVehicleData();
-        saveOwnerData();
-        saveParkingData();
-        printf("Vehicle deleted successfully.\n");
-    } else {
-        printf("Vehicle deletion cancelled.\n");
-    }
-}
-
+// Debugging Functions
 void debugShowAllAdmins() {
     printf("\n========== DEBUG: ALL ADMINS ==========\n");
     printf("Total admins: %d\n", numAdmins);
@@ -818,254 +1059,7 @@ void debugShowAllAdmins() {
     }
 }
 
-// Data saving functions
-
-// Admin Data
-void saveAdminData() {
-    FILE *fp = fopen("admin/data.txt", "a");
-    if (fp == NULL) {
-        printf("ERROR: Cannot create/open admin data file!\n");
-        return;
-    }
-
-    fprintf(fp, "%d\n", numAdmins);
-    for (int i = 0; i < numAdmins; i++) {
-        fprintf(fp, "%s|%s|%s|%s\n",
-                admins[i].name,
-                admins[i].phoneNumber,
-                admins[i].email,
-                admins[i].password);
-    }
-
-    fclose(fp);
-}
-
-// Owner Data
-void saveOwnerData() {
-    FILE *fp = fopen("owners/data.txt", "a");
-    if (fp == NULL) {
-        printf("ERROR: Cannot create/open owner data file!\n");
-        return;
-    }
-//fprintf(fp, "%s %s %s %s\n", ownerID, name, contact, vehicleID);
-    fprintf(fp, "%d\n", numOwners);
-    for (int i = 0; i < numOwners; i++) {
-        fprintf(fp, "%s|%s|%s|%s\n",
-                owners[i].ownerId,
-                owners[i].name,
-                owners[i].phoneNumber,
-                owners[i].vehicleID);
-    }
-
-    fclose(fp);
-}
-
-// Vehicle Data
-void saveVehicleData() {
-    FILE *fp = fopen("vehicles/data.txt", "a");
-    if (fp == NULL) {
-        printf("ERROR: Cannot create/open vehicle data file!\n");
-        return;
-    }
-
-    fprintf(fp, "%d\n", numVehicles);
-    for (int i = 0; i < numVehicles; i++) {
-        fprintf(fp, "%s|%s|%s|%s|%d|%d|%s|%ld\n",
-                vehicles[i].vehicleId,
-                vehicles[i].licensePlate,
-                vehicles[i].ownerName,
-                vehicles[i].vehicleType,
-                vehicles[i].isParked,
-                vehicles[i].spotNumber,
-                vehicles[i].ownerPhoneNumber,
-                vehicles[i].entryTime);
-    }
-
-    fclose(fp);
-}
-
-// Parking Data
-void saveParkingData() {
-    FILE *fp = fopen("parking/data.txt", "a");
-    if (fp == NULL) {
-        printf("ERROR: Cannot create/open parking data file!\n");
-        return;
-    }
-
-    for (int i = 0; i < MAX_PARKING_SPOTS; i++) {
-        fprintf(fp, "%d|%d|%s|%ld|%.2f\n",
-                spots[i].spotNumber,
-                spots[i].isOccupied,
-                spots[i].vehicleId,
-                spots[i].entryTime,
-                spots[i].parkingFee);
-    }
-
-    fclose(fp);
-}
-
-// Data loading functions
-
-// Admin Data
-void loadAdminData() {
-    FILE *fp = fopen("admin/data.txt", "r");
-    if (fp == NULL) {
-        numAdmins = 0;
-        return;
-    }
-
-    if (fscanf(fp, "%d", &numAdmins) != 1) {
-        numAdmins = 0;
-        fclose(fp);
-        return;
-    }
-
-    char line[500];
-    fgets(line, sizeof(line), fp); // consume newline
-
-    for (int i = 0; i < numAdmins; i++) {
-        if (fgets(line, sizeof(line), fp) == NULL) break;
-
-        line[strcspn(line, "\n")] = 0;
-
-        char *token = strtok(line, "|");
-        if (token) strcpy(admins[i].name, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(admins[i].phoneNumber, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(admins[i].email, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(admins[i].password, token);
-    }
-
-    fclose(fp);
-}
-
-// Owner Data
-void loadOwnerData() {
-    FILE *fp = fopen("owners/data.txt", "r");
-    if (fp == NULL) {
-        numOwners = 0;
-        return;
-    }
-
-    if (fscanf(fp, "%d", &numOwners) != 1) {
-        numOwners = 0;
-        fclose(fp);
-        return;
-    }
-
-    char line[1000];
-    fgets(line, sizeof(line), fp); // consume newline
-
-    for (int i = 0; i < numOwners; i++) {
-        if (fgets(line, sizeof(line), fp) == NULL) break;
-
-        line[strcspn(line, "\n")] = 0;
-
-        char *token = strtok(line, "|");
-        if (token) strcpy(owners[i].ownerId, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(owners[i].name, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(owners[i].phoneNumber, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(owners[i].vehicleID, token);
-    }
-
-    fclose(fp);
-}
-
-// Vehicle Data
-void loadVehicleData() {
-    FILE *fp = fopen("vehicles/data.txt", "r");
-    if (fp == NULL) {
-        numVehicles = 0;
-        return;
-    }
-
-    if (fscanf(fp, "%d", &numVehicles) != 1) {
-        numVehicles = 0;
-        fclose(fp);
-        return;
-    }
-
-    char line[1000];
-    fgets(line, sizeof(line), fp); // consume newline
-
-    for (int i = 0; i < numVehicles; i++) {
-        if (fgets(line, sizeof(line), fp) == NULL) break;
-
-        line[strcspn(line, "\n")] = 0;
-
-        char *token = strtok(line, "|");
-        if (token) strcpy(vehicles[i].vehicleId, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(vehicles[i].licensePlate, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(vehicles[i].ownerName, token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(vehicles[i].vehicleType, token);
-
-        token = strtok(NULL, "|");
-        if (token) vehicles[i].isParked = atoi(token);
-
-        token = strtok(NULL, "|");
-        if (token) vehicles[i].spotNumber = atoi(token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(vehicles[i].ownerId, token);
-
-        token = strtok(NULL, "|");
-        if (token) vehicles[i].entryTime = atol(token);
-    }
-
-    fclose(fp);
-}
-
-void loadParkingData() {
-    FILE *fp = fopen("parking/data.txt", "r");
-    if (fp == NULL) {
-        return;
-    }
-
-    char line[200];
-    int i = 0;
-
-    while (fgets(line, sizeof(line), fp) != NULL && i < MAX_PARKING_SPOTS) {
-        line[strcspn(line, "\n")] = 0;
-
-        char *token = strtok(line, "|");
-        if (token) spots[i].spotNumber = atoi(token);
-
-        token = strtok(NULL, "|");
-        if (token) spots[i].isOccupied = atoi(token);
-
-        token = strtok(NULL, "|");
-        if (token) strcpy(spots[i].vehicleId, token);
-
-        token = strtok(NULL, "|");
-        if (token) spots[i].entryTime = atol(token);
-
-        token = strtok(NULL, "|");
-        if (token) spots[i].parkingFee = atof(token);
-
-        i++;
-    }
-
-    fclose(fp);
-}
-
-// Utility functions
+// Utility functions (For Validations)
 
 // Validate Name
 int isValidName(char *name) {
