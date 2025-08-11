@@ -90,6 +90,7 @@ void saveParkingData();
 void loadParkingData();
 void displayParkingStatus();
 void generateReport();
+void createDirectories();
 
 // Validation functions
 int isValidName(char *name);        
@@ -98,7 +99,6 @@ int isValidPhoneNumber(char *phone);
 int isValidPassword(char *password);
 int isValidLicensePlate(char *plate);
 void clearInputBuffer();
-void createDirectories();
 int findOwnerById(char *ownerId);
 int findVehicleById(char *vehicleId);
 int findAvailableSpot();
