@@ -325,7 +325,7 @@ int loginAdmin() {
     return 0;
 }
 
-// Admin menu function
+// Admin menu
 void adminMenu() {                  
     int choice;
     while (1) {
@@ -366,7 +366,7 @@ void adminMenu() {
     }
 }
 
-// Admin Data Management
+// Admin Data Append
 void saveAdminData() {
     FILE *fp = fopen("admin/data.txt", "a");
     if (fp == NULL) {
@@ -386,7 +386,7 @@ void saveAdminData() {
     fclose(fp);
 }
 
-// Admin Data
+// Admin Data Read
 void loadAdminData() {
     FILE *fp = fopen("admin/data.txt", "r");
     if (fp == NULL) {
@@ -817,7 +817,7 @@ void saveOwnerData() {
     fclose(fp);
 }
 
-// Owner Data
+// Owner Data Read
 void loadOwnerData() {
     FILE *fp = fopen("owners/data.txt", "r");
     if (fp == NULL) {
