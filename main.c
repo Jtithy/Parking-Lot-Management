@@ -73,24 +73,26 @@ void adminMenu();
 int loginAdmin();
 void registerAdmin();
 void saveAdminData();
-void saveOwnerData();
-void saveVehicleData();
-void saveParkingData();
 void loadAdminData();
-void loadOwnerData();
-void loadVehicleData();
-void loadParkingData();
+void manageVehicles();
 void addVehicle();
 void parkVehicle();
 void unparkVehicle();
+void deleteVehicle();
+void saveVehicleData();
+void loadVehicleData();
+void viewAllVehicles();
+void viewAllOwners();
+void saveOwnerData();
+void loadOwnerData();
+void displayOwnerDetails();
+void saveParkingData();
+void loadParkingData();
 void displayParkingStatus();
 void generateReport();
-void manageOwners();
-void manageVehicles();
-void viewAllOwners();
-void viewAllVehicles();
-void deleteOwner();
-void deleteVehicle();
+
+
+
 double calculateParkingFee(time_t entryTime);
 
 // Validation functions
