@@ -1161,8 +1161,19 @@ int isValidPassword(char *password) {
 
 // Validate License Plate
 int isValidLicensePlate(char *plate) {
-    int len = strlen(plate);
-    return (len >= 3 && len < LICENSE_PLATE_LEN);
+    char letters[4];
+    int digits;
+
+    // 3 Uppercase Letters, 1 Dash, And 4 Digits
+    if (sscanf(plate, "%3[A-Z]-%4d", letters, &digits) != 2)
+    {
+        if (strlen(plate) != 8)
+        {
+            printf("Invalid License Plate.\n");
+            return 0;
+        }
+    }
+    return 1;
 }
 
 void clearInputBuffer() {
