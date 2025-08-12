@@ -132,8 +132,7 @@ void generateOwnerId(char *ownerId);
 void generateVehicleId(char *vehicleId);
 double calculateParkingFee(time_t entryTime);
 
-// Debugging function
-void debugShowAllAdmins();
+
 
 int main()
 {
@@ -1248,29 +1247,6 @@ void generateReport()
     printf("Available: %d\n", MAX_PARKING_SPOTS - occupied);
     printf("Occupancy Rate: %.1f%%\n", (float)occupied / MAX_PARKING_SPOTS * 100);
     printf("Current Revenue: TK- %.2f/=\n", totalRevenue);
-}
-
-// Debugging Functions
-void debugShowAllAdmins()
-{
-    printf("\n========== DEBUG: ALL ADMINS ==========\n");
-    printf("Total admins: %d\n", numAdmins);
-
-    if (numAdmins == 0)
-    {
-        printf("No admins registered.\n");
-        return;
-    }
-
-    for (int i = 0; i < numAdmins; i++)
-    {
-        printf("Admin %d:\n", i + 1);
-        printf("  Name: '%s'\n", admins[i].name);
-        printf("  Phone: '%s'\n", admins[i].phoneNumber);
-        printf("  Email: '%s'\n", admins[i].email);
-        printf("  Password: '%s'\n", admins[i].password);
-        printf("---\n");
-    }
 }
 
 // Utility functions (For Validations)
