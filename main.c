@@ -255,7 +255,7 @@ void registerAdmin() {
         }
         temp_input[strcspn(temp_input, "\n")] = 0;
 
-        if (isValidEmail(temp_input)) {
+         if (isValidEmail(temp_input)) {
             strcpy(admins[numAdmins].email, temp_input);
             break;
         } else {
