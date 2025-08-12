@@ -817,7 +817,7 @@ void saveOwnerData() {
         printf("ERROR: Cannot create/open owner data file!\n");
         return;
     }
-   // fprintf(fp, "%s %s %s %s\n", ownerID, name, contact, vehicleID);
+   // fprintf(fp, "%s %s %s %s\n", ownerID, name, contact, vehicleID); //hjkljkjkkkkjkkk
     fprintf(fp, "%d\n", numOwners);
     for (int i = 0; i < numOwners; i++) {
         fprintf(fp, "%s|%s|%s|%s\n",
@@ -892,7 +892,7 @@ void loadOwnerData() {
 
 } */
 
-
+// View all Owners
 void viewAllOwners() {
     printf("\n========== ALL OWNERS ==========\n");
     if (numOwners == 0) {
@@ -902,16 +902,31 @@ void viewAllOwners() {
 
     printf("\n===== Registered Owners =====\n");
     printf("%-5s %-15s %-25s %-15s %-15s\n",
-           "No.", "Owner ID", "Name", "Contact", "Vehicle ID");
+           "No.", "Owner ID", "Name", "Contact", "License Plate"); // Changed "Vehicle ID" to "License Plate"
     printf("--------------------------------------------------------------------------\n");
 
     for (int i = 0; i < numOwners; i++) {
-        printf("%-5d %-15s %-25s %-15s %-15s\n", // %d for integer
+        char licensePlate[LICENSE_PLATE_LEN] = "N/A";
+        int vehicleIndex = -1;
+        
+        // Find the vehicle corresponding to the owner's vehicleID
+        for (int j = 0; j < numVehicles; j++) {
+            if (strcmp(owners[i].vehicleID, vehicles[j].vehicleId) == 0) {
+                vehicleIndex = j;
+                break;
+            }
+        }
+
+        if (vehicleIndex != -1) {
+            strcpy(licensePlate, vehicles[vehicleIndex].licensePlate);
+        }
+
+        printf("%-5d %-15s %-25s %-15s %-15s\n",
                i + 1,
                owners[i].ownerId,
                owners[i].name,
                owners[i].phoneNumber,
-               owners[i].vehicleID);
+              vehicles[i].licensePlate); // Changed from owners[i].vehicleID to licensePlate
     }
 }
 
