@@ -152,7 +152,7 @@ void initializeSystem() {
     loadVehicleData();
     loadParkingData();
 
-    printf("=== Parking Lot Management System Initialized ===\n");
+    printf("=== System Initialized ===\n");
     printf("Total Parking Spots: %d\n", MAX_PARKING_SPOTS);
     printf("Registered Admins: %d\n", numAdmins);
     printf("Registered Vehicles: %d\n", numVehicles);
@@ -162,7 +162,7 @@ void initializeSystem() {
 void mainMenu() {
     int choice;
     while (1) {
-        printf("\n========== PARKING LOT MANAGEMENT SYSTEM ==========\n");
+        printf("\n========== PARQUEO: A PARKING LOT MANAGEMENT SYSTEM ==========\n");
         printf("1. Admin Login\n");
         printf("2. Register as Admin\n");
         printf("3. Exit\n");
@@ -338,6 +338,7 @@ int loginAdmin() {
 void adminMenu() {
     int choice;
     while (1) {
+        printf("\n==========Welcome to PARQUEO==========");
         printf("\n========== ADMIN PANEL ==========\n");
         printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
