@@ -166,7 +166,7 @@ void mainMenu() {
         printf("1. Admin Login\n");
         printf("2. Register as Admin\n");
         printf("3. Exit\n");
-        printf("===================================================\n");
+        printf("===============================================================\n");
         printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1) {
@@ -339,13 +339,13 @@ void adminMenu() {
     int choice;
     while (1) {
         printf("\n==========Welcome to PARQUEO==========");
-        printf("\n========== ADMIN PANEL ==========\n");
+        printf("\n========== ADMIN PANEL ===============\n");
         printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
         printf("3. Generate Report\n");
         printf("4. View All Owners\n");
         printf("5. Logout\n");
-        printf("=================================\n");
+        printf("=====================================\n");
         printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1) {
