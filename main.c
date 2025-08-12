@@ -1330,8 +1330,7 @@ int isValidLicensePlate(char *plate)
 void clearInputBuffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF)
-        ;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
 
 int findOwnerById(char *ownerId)
