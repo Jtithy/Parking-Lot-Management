@@ -19,7 +19,6 @@
 #define VEHICLE_TYPE_LEN 20
 
 //CREATING ALL FOLDER
-
 #ifdef _WIN32
 #include <direct.h>
 #else
