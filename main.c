@@ -1,3 +1,13 @@
+/* 
+   Parking Lot Management System
+   Author: Jeb-UN-Nesa Tithy, Nishat Biswas Pranto, Shahriar Kabir
+   Workflow check: https://github.com/Jtithy/Parking-Lot-Management
+   Date: 1st August, 2025
+   Description: A system to manage parking lots, including vehicle registration, parking, and fee calculation[Admin based program].
+   Note: To generate parking report, first add and park vehicle.
+*/
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
