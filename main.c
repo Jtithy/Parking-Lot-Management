@@ -20,7 +20,7 @@
 #define NAME_LEN 50
 #define EMAIL_LEN 20
 #define CONTACT_LEN 12
-#define PASSWORD_LEN 50
+#define PASSWORD_LEN 30
 #define OWNER_ID_LEN 20
 #define VEHICLE_ID_LEN 20
 #define LICENSE_PLATE_LEN 15
@@ -1262,7 +1262,7 @@ void generateReport()
 // Validate Name
 int isValidName(char *name)
 {
-    if (strlen(name) > 20 || strlen(name) < 2)
+    if (strlen(name) > 50 || strlen(name) < 2)
     {
         return 0; // Invalid name length
     }
