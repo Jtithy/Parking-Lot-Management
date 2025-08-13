@@ -1,11 +1,3 @@
-/* 
-   Parking Lot Management System
-   Author: Jeb-UN-Nesa Tithy, Nishat Biswas Pranto, Shahriar Kabir
-   Workflow check: https://github.com/Jtithy/Parking-Lot-Management
-   Date: 1st August, 2025
-   Description: A system to manage parking lots, including vehicle registration, parking, and fee calculation[Admin based program].
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -20,13 +12,14 @@
 #define NAME_LEN 50
 #define EMAIL_LEN 20
 #define CONTACT_LEN 12
-#define PASSWORD_LEN 30
+#define PASSWORD_LEN 50
 #define OWNER_ID_LEN 20
 #define VEHICLE_ID_LEN 20
 #define LICENSE_PLATE_LEN 15
 #define VEHICLE_TYPE_LEN 20
 
 // CREATING ALL FOLDER
+
 #ifdef _WIN32
 #include <direct.h>
 #else
@@ -40,11 +33,13 @@ void createFolders()
     _mkdir("vehicles");
     _mkdir("owners");
     _mkdir("parking");
+    _mkdir("reports");
 #else
     mkdir("admin", 0777);
     mkdir("vehicles", 0777);
     mkdir("owners", 0777);
     mkdir("parking", 0777);
+    mkdir("reports", 0777);
 #endif
 }
 // END FOLDER
@@ -140,7 +135,8 @@ void generateOwnerId(char *ownerId);
 void generateVehicleId(char *vehicleId);
 double calculateParkingFee(time_t entryTime);
 
-
+// Debugging function
+void debugShowAllAdmins();
 
 int main()
 {
@@ -166,7 +162,7 @@ void initializeSystem()
     loadVehicleData();
     loadParkingData();
 
-    printf("=== System Initialized ===\n");
+    printf("=== Parking Lot Management System Initialized ===\n");
     printf("Total Parking Spots: %d\n", MAX_PARKING_SPOTS);
     printf("Registered Admins: %d\n", numAdmins);
     printf("Registered Vehicles: %d\n", numVehicles);
@@ -178,11 +174,11 @@ void mainMenu()
     int choice;
     while (1)
     {
-        printf("\n========== PARQUEO: A PARKING LOT MANAGEMENT SYSTEM ==========\n");
+        printf("\n========== PARKING LOT MANAGEMENT SYSTEM ==========\n");
         printf("1. Admin Login\n");
         printf("2. Register as Admin\n");
         printf("3. Exit\n");
-        printf("===============================================================\n");
+        printf("===================================================\n");
         printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1)
@@ -391,14 +387,13 @@ void adminMenu()
     int choice;
     while (1)
     {
-        printf("\n==========Welcome to PARQUEO==========");
-        printf("\n========== ADMIN PANEL ===============\n");
+        printf("\n========== ADMIN PANEL ==========\n");
         printf("1. Manage Vehicles\n");
         printf("2. View Parking Status\n");
         printf("3. Generate Report\n");
         printf("4. View All Owners\n");
         printf("5. Logout\n");
-        printf("=====================================\n");
+        printf("=================================\n");
         printf("Enter your choice: ");
 
         if (scanf("%d", &choice) != 1)
@@ -520,7 +515,7 @@ void manageVehicles()
         {
             printf("Invalid input.\n");
             clearInputBuffer();
-            continue;
+            return;
         }
         clearInputBuffer();
 
@@ -557,7 +552,7 @@ void addVehicle()
     char licensePlate[LICENSE_PLATE_LEN];
     char ownerName[NAME_LEN];
     char vehicleType[VEHICLE_TYPE_LEN];
-    char ownerId[OWNER_ID_LEN];
+    int ownerId;
     char temp_input[200];
 
     // Get license plate
@@ -1029,7 +1024,6 @@ void loadOwnerData()
 
 } */
 
-// View all Owners
 void viewAllOwners()
 {
     printf("\n========== ALL OWNERS ==========\n");
@@ -1041,35 +1035,17 @@ void viewAllOwners()
 
     printf("\n===== Registered Owners =====\n");
     printf("%-5s %-15s %-25s %-15s %-15s\n",
-           "No.", "Owner ID", "Name", "Contact", "License Plate"); // Changed "Vehicle ID" to "License Plate"
+           "No.", "Owner ID", "Name", "Contact", "Vehicle ID");
     printf("--------------------------------------------------------------------------\n");
 
     for (int i = 0; i < numOwners; i++)
     {
-        char licensePlate[LICENSE_PLATE_LEN] = "N/A";
-        int vehicleIndex = -1;
-
-        // Find the vehicle corresponding to the owner's vehicleID
-        for (int j = 0; j < numVehicles; j++)
-        {
-            if (strcmp(owners[i].vehicleID, vehicles[j].vehicleId) == 0)
-            {
-                vehicleIndex = j;
-                break;
-            }
-        }
-
-        if (vehicleIndex != -1)
-        {
-            strcpy(licensePlate, vehicles[vehicleIndex].licensePlate);
-        }
-
         printf("%-5d %-15s %-25s %-15s %-15s\n",
                i + 1,
                owners[i].ownerId,
                owners[i].name,
                owners[i].phoneNumber,
-               vehicles[i].licensePlate); // Changed from owners[i].vehicleID to licensePlate
+               owners[i].vehicleID);
     }
 }
 
@@ -1257,12 +1233,35 @@ void generateReport()
     printf("Current Revenue: TK- %.2f/=\n", totalRevenue);
 }
 
+// Debugging Functions
+void debugShowAllAdmins()
+{
+    printf("\n========== DEBUG: ALL ADMINS ==========\n");
+    printf("Total admins: %d\n", numAdmins);
+
+    if (numAdmins == 0)
+    {
+        printf("No admins registered.\n");
+        return;
+    }
+
+    for (int i = 0; i < numAdmins; i++)
+    {
+        printf("Admin %d:\n", i + 1);
+        printf("  Name: '%s'\n", admins[i].name);
+        printf("  Phone: '%s'\n", admins[i].phoneNumber);
+        printf("  Email: '%s'\n", admins[i].email);
+        printf("  Password: '%s'\n", admins[i].password);
+        printf("---\n");
+    }
+}
+
 // Utility functions (For Validations)
 
 // Validate Name
 int isValidName(char *name)
 {
-    if (strlen(name) > 50 || strlen(name) < 2)
+    if (strlen(name) > 20 || strlen(name) < 2)
     {
         return 0; // Invalid name length
     }
@@ -1338,7 +1337,8 @@ int isValidLicensePlate(char *plate)
 void clearInputBuffer()
 {
     int c;
-    while ((c = getchar()) != '\n' && c != EOF);
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
 }
 
 int findOwnerById(char *ownerId)

@@ -1,0 +1,20 @@
+=== PARKING LOT MANAGEMENT REPORT ===
+Generated on: Wed Aug 13 22:41:05 2025
+
+==========================================
+
+SYSTEM STATISTICS:
+Total Parking Spots: 50
+Occupied Spots: 1
+Available Spots: 49
+Occupancy Rate: 2.0%
+Estimated Current Revenue: TK- 100.00/=
+
+OWNER STATISTICS:
+Registered Vehicles: 1
+Registered Admins: 1
+
+CURRENTLY PARKED VEHICLES:
+Spot Vehicle ID      License         Owner                Type       Duration(hrs)  
+--------------------------------------------------------------------------------
+1    VH0001          ASF-1234        Jane                 Jeep       0.0
